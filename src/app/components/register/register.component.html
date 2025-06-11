@@ -1,0 +1,120 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <h2 class="mb-4 text-center">Registro de Usuario</h2>
+
+            <form (ngSubmit)="register()" #form="ngForm">
+
+                <!-- Selección de tipo de usuario -->
+                <div class="mb-4">
+                    <label for="tipoUsuario" class="form-label">Tipo de usuario</label>
+                    <select [(ngModel)]="tipoUsuario" name="tipoUsuario" id="tipoUsuario" class="form-select" required>
+                        <option value="" disabled selected>Seleccionar tipo</option>
+                        <option value="paciente">Paciente</option>
+                        <option value="especialista">Especialista</option>
+                        <!-- <option value="administrador">Administrador (disponible ahora solo para testing)</option> -->
+                        <!-- <option value="administrador" disabled>Administrador (disponible ahora solo para testing)</option> -->
+                    </select>
+                </div>
+
+                <!-- Mostrar resto del formulario solo si el tipo es válido -->
+                <div *ngIf="tipoUsuario === 'paciente' || tipoUsuario === 'especialista' || tipoUsuario === 'administrador' ">
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input [(ngModel)]="email" name="email" id="email" type="email" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input [(ngModel)]="password" name="password" id="password" type="password" class="form-control"
+                            required minlength="6" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input [(ngModel)]="nombre" name="nombre" id="nombre" type="text" class="form-control"
+                            required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="apellido" class="form-label">Apellido</label>
+                        <input [(ngModel)]="apellido" name="apellido" id="apellido" type="text" class="form-control"
+                            required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edad" class="form-label">Edad</label>
+                        <input [(ngModel)]="edad" name="edad" id="edad" type="number" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="dni" class="form-label">DNI</label>
+                        <input [(ngModel)]="dni" name="dni" id="dni" type="text" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="foto1" class="form-label">Foto 1 (obligatoria)</label>
+                        <input type="file" (change)="onFoto1Selected($event)" id="foto1" class="form-control"
+                            required />
+                    </div>
+
+                    <!-- PACIENTE -->
+                    <div *ngIf="tipoUsuario === 'paciente'">
+                        <div class="mb-3">
+                            <label for="foto2" class="form-label">Foto 2 (obligatoria)</label>
+                            <input type="file" (change)="onFoto2Selected($event)" id="foto2" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="obraSocial" class="form-label">Obra Social</label>
+                            <input [(ngModel)]="obraSocial" name="obraSocial" id="obraSocial" type="text"
+                                class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- ESPECIALISTA -->
+                    <div *ngIf="tipoUsuario === 'especialista'">
+                        <div class="mb-3">
+
+                            <div class="mb-3">
+                                <label for="especialidad" class="form-label">Especialidad</label>
+                                <select [(ngModel)]="especialidadSeleccionada" name="especialidadSeleccionada"
+                                    id="especialidad" class="form-select" required>
+                                    <option value="" disabled selected>Seleccionar especialidad</option>
+                                    <option *ngFor="let esp of especialidades" [value]="esp">{{ esp }}</option>
+                                </select>
+                            </div>
+
+                            <div *ngIf="especialidadSeleccionada === 'Otra'" class="mb-3">
+                                <label for="especialidadPersonalizada" class="form-label">Otra especialidad</label>
+                                <input [(ngModel)]="especialidadPersonalizada" name="especialidadPersonalizada"
+                                    id="especialidadPersonalizada" type="text" class="form-control" required />
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+                        {{ errorMessage }}
+                    </div>
+
+                    <div *ngIf="isLoading" class="text-center mt-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="mt-2">Registro en progreso, en breve será redirigido al login...</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mt-3"
+                        [disabled]="form.invalid">Registrar</button>
+                    
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
