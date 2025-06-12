@@ -1,12 +1,5 @@
 {
   "version": 2,
-  "public": true,
-  "builds": [
-    {
-      "src": "dist/clinica/browser/**",
-      "use": "@vercel/static"
-    }
-  ],
   "routes": [
     {
       "src": "/(.*)",
