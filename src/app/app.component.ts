@@ -35,7 +35,6 @@ export class AppComponent implements OnInit{
     });
   }
 
-
   
   logout() {
   this.supabaseService.client.auth.signOut().then(() => {

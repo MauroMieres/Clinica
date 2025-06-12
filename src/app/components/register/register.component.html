@@ -1,117 +1,128 @@
-<form [formGroup]="form" (ngSubmit)="register()" class="container mt-4">
-  <h2 class="mb-4">Registro</h2>
+<div class="full-background d-flex align-items-center justify-content-start min-vh-100 position-relative">
 
-  <!-- Tipo de Usuario -->
-  <div class="mb-3">
-    <label for="tipoUsuario" class="form-label">Tipo de Usuario</label>
-    <select id="tipoUsuario" class="form-select" formControlName="tipoUsuario" (change)="onTipoUsuarioChange(form.value.tipoUsuario)">
-      <option value="">Seleccionar...</option>
-      <option value="paciente">Paciente</option>
-      <option value="especialista">Especialista</option>
-      <option *ngIf="mostrarAdmin" value="administrador">Administrador</option>
-    </select>
-    <div *ngIf="esCampoValido('tipoUsuario')" class="text-danger">Campo obligatorio</div>
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner-border text-light" role="status" style="width: 4rem; height: 4rem;">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
   </div>
 
-  <!-- Cartel de ayuda si NO se seleccionó todavía -->
-  <div *ngIf="tipoUsuario === ''" class="alert alert-info">
-    Seleccioná el tipo de usuario para continuar con el registro.
+  <div class="container position-relative z-2">
+    <div class="row justify-content-start">
+      <div class="col-md-6">
+        <div class="form-box bg-white rounded shadow p-4 w-100">
+
+          <form [formGroup]="form" (ngSubmit)="register()">
+            <h2 class="mb-4">Registro</h2>
+
+            <div class="mb-3">
+              <label for="tipoUsuario" class="form-label">Tipo de Usuario</label>
+              <select id="tipoUsuario" class="form-select" formControlName="tipoUsuario" (change)="onTipoUsuarioChange(form.value.tipoUsuario)">
+                <option value="">Seleccionar...</option>
+                <option value="paciente">Paciente</option>
+                <option value="especialista">Especialista</option>
+                <option *ngIf="mostrarAdmin" value="administrador">Administrador</option>
+              </select>
+              <div *ngIf="esCampoValido('tipoUsuario')" class="text-danger">Campo obligatorio</div>
+            </div>
+
+            <div *ngIf="tipoUsuario === ''" class="alert alert-info">
+              Seleccioná el tipo de usuario para continuar con el registro.
+            </div>
+
+            <div *ngIf="tipoUsuario !== ''">
+              <div class="mb-3">
+                <label for="email" class="form-label">Correo</label>
+                <input id="email" type="email" class="form-control" formControlName="email" />
+                <div *ngIf="esCampoValido('email')" class="text-danger">Email inválido.</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <input type="password" class="form-control" formControlName="password" />
+                <div *ngIf="esCampoValido('password')" class="text-danger">Campo obligatorio. Mínimo 6 caracteres.</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input type="text" class="form-control" formControlName="nombre" />
+                <div *ngIf="esCampoValido('nombre')" class="text-danger">Nombre inválido, solo letras.</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Apellido</label>
+                <input type="text" class="form-control" formControlName="apellido" />
+                <div *ngIf="esCampoValido('apellido')" class="text-danger">Apellido inválido, solo letras.</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Edad</label>
+                <input type="number" class="form-control" formControlName="edad" />
+                <div *ngIf="esCampoValido('edad')" class="text-danger">Edad entre 18 y 99.</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">DNI</label>
+                <input type="text" class="form-control" formControlName="dni" />
+                <div *ngIf="esCampoValido('dni')" class="text-danger">DNI inválido, solo números.</div>
+              </div>
+
+              <div *ngIf="tipoUsuario === 'paciente'">
+                <div class="mb-3">
+                  <label class="form-label">Obra Social</label>
+                  <input type="text" class="form-control" formControlName="obraSocial" />
+                  <div *ngIf="esCampoValido('obraSocial')" class="text-danger">Campo obligatorio, solo letras.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Foto 1 (perfil)</label>
+                  <input type="file" class="form-control" (change)="onFoto1Selected($event)" accept="image/*" />
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Foto 2 (credencial)</label>
+                  <input type="file" class="form-control" (change)="onFoto2Selected($event)" accept="image/*" />
+                </div>
+              </div>
+
+              <div *ngIf="tipoUsuario === 'especialista'">
+                <div class="mb-3">
+                  <label class="form-label">Especialidad</label>
+                  <select class="form-select" formControlName="especialidadSeleccionada">
+                    <option value="">Seleccionar...</option>
+                    <option *ngFor="let esp of especialidades" [value]="esp">{{ esp }}</option>
+                  </select>
+                  <div *ngIf="esCampoValido('especialidadSeleccionada')" class="text-danger">Campo obligatorio.</div>
+                </div>
+
+                <div *ngIf="form.value.especialidadSeleccionada === 'Otra'" class="mb-3">
+                  <label class="form-label">Especialidad Personalizada</label>
+                  <input type="text" class="form-control" formControlName="especialidadPersonalizada" />
+                  <div *ngIf="esCampoValido('especialidadPersonalizada')" class="text-danger">Campo obligatorio, solo letras.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Foto de perfil</label>
+                  <input type="file" class="form-control" (change)="onFoto1Selected($event)" accept="image/*" />
+                </div>
+              </div>
+
+              <div *ngIf="tipoUsuario === 'administrador'">
+                <div class="mb-3">
+                  <label class="form-label">Foto de perfil</label>
+                  <input type="file" class="form-control" (change)="onFoto1Selected($event)" accept="image/*" />
+                </div>
+              </div>
+
+              <div *ngIf="errorMessage" class="text-danger mt-3">{{ errorMessage }}</div>
+
+              <button type="submit" class="btn btn-primary mt-3" [disabled]="!formularioCompleto() || isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {{ isLoading ? 'Registrando...' : 'Registrarse' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <!-- Todo el resto del formulario solo aparece si se eligió el tipo -->
-  <div *ngIf="tipoUsuario !== ''">
-    <div class="mb-3">
-      <label for="email" class="form-label">Correo</label>
-      <input id="email" type="email" class="form-control" formControlName="email" />
-      <div *ngIf="esCampoValido('email')" class="text-danger">Email inválido</div>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">Contraseña</label>
-      <input type="password" class="form-control" formControlName="password" />
-      <div *ngIf="esCampoValido('password')" class="text-danger">Campo obligatorio</div>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">Nombre</label>
-      <input type="text" class="form-control" formControlName="nombre" />
-      <div *ngIf="esCampoValido('nombre')" class="text-danger">Nombre inválido, solo letras</div>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">Apellido</label>
-      <input type="text" class="form-control" formControlName="apellido" />
-      <div *ngIf="esCampoValido('apellido')" class="text-danger">Apellido inválido, solo letras</div>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">Edad</label>
-      <input type="number" class="form-control" formControlName="edad" />
-      <div *ngIf="esCampoValido('edad')" class="text-danger">Edad entre 18 y 99</div>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">DNI</label>
-      <input type="text" class="form-control" formControlName="dni" />
-      <div *ngIf="esCampoValido('dni')" class="text-danger">DNI inválido, solo números</div>
-    </div>
-
-    <!-- PACIENTE -->
-    <div *ngIf="tipoUsuario === 'paciente'">
-      <div class="mb-3">
-        <label class="form-label">Obra Social</label>
-        <input type="text" class="form-control" formControlName="obraSocial" />
-        <div *ngIf="esCampoValido('obraSocial')" class="text-danger">Campo obligatorio, solo letras</div>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Foto 1 (perfil)</label>
-        <input type="file" class="form-control" (change)="onFoto1Selected($event)" accept="image/*" />
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Foto 2 (credencial)</label>
-        <input type="file" class="form-control" (change)="onFoto2Selected($event)" accept="image/*" />
-      </div>
-    </div>
-
-    <!-- ESPECIALISTA -->
-    <div *ngIf="tipoUsuario === 'especialista'">
-      <div class="mb-3">
-        <label class="form-label">Especialidad</label>
-        <select class="form-select" formControlName="especialidadSeleccionada">
-          <option value="">Seleccionar...</option>
-          <option *ngFor="let esp of especialidades" [value]="esp">{{ esp }}</option>
-        </select>
-        <div *ngIf="esCampoValido('especialidadSeleccionada')" class="text-danger">Campo obligatorio</div>
-      </div>
-
-      <div *ngIf="form.value.especialidadSeleccionada === 'Otra'" class="mb-3">
-        <label class="form-label">Especialidad Personalizada</label>
-        <input type="text" class="form-control" formControlName="especialidadPersonalizada" />
-        <div *ngIf="esCampoValido('especialidadPersonalizada')" class="text-danger">Campo obligatorio, solo letras</div>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Foto de perfil</label>
-        <input type="file" class="form-control" (change)="onFoto1Selected($event)" accept="image/*" />
-      </div>
-    </div>
-
-    <!-- ADMINISTRADOR -->
-    <div *ngIf="tipoUsuario === 'administrador'">
-      <div class="mb-3">
-        <label class="form-label">Foto de perfil</label>
-        <input type="file" class="form-control" (change)="onFoto1Selected($event)" accept="image/*" />
-      </div>
-    </div>
-
-    <!-- Botón de registro -->
-    <button type="submit" class="btn btn-primary" [disabled]="!formularioCompleto() || isLoading">
-  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-  {{ isLoading ? 'Registrando...' : 'Registrarse' }}
-</button>
-  </div>
-
-  <div *ngIf="errorMessage" class="text-danger mt-3">{{ errorMessage }}</div>
-</form>
+</div>

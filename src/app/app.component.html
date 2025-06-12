@@ -21,6 +21,7 @@
         <li *ngIf="!isLoggedIn" class="nav-item">
           <a class="nav-link" routerLink="/register">Registro</a>
         </li>
+        
         <li *ngIf="isLoggedIn" class="nav-item">
           <button class="btn btn-outline-danger" (click)="logout()">Cerrar sesión</button>
         </li>

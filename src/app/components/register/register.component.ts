@@ -1,7 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../../services/supabase.service';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  AbstractControl,
+  ValidationErrors
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -28,26 +35,13 @@ export class RegisterComponent implements OnInit {
     private router: Router
   ) {}
 
-  obtenerEspecialidades() {
-  this.supabaseService.client
-    .from('especialidades')
-    .select('nombre')
-    .then(({ data, error }) => {
-      if (!error && data) {
-        this.especialidades = data.map((e: any) => e.nombre);
-        this.especialidades.push('Otra');
-      }
-    });
-}
-
-
   ngOnInit(): void {
     this.obtenerEspecialidades();
 
     this.form = this.fb.group({
       tipoUsuario: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      password:  ['', [Validators.required, Validators.minLength(6)]],
       nombre: ['', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/)]],
       apellido: ['', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/)]],
       edad: ['', [Validators.required, Validators.min(18), Validators.max(99)]],
@@ -59,6 +53,19 @@ export class RegisterComponent implements OnInit {
       validators: this.validarEspecialidad.bind(this)
     });
   }
+
+  obtenerEspecialidades() {
+    this.supabaseService.client
+      .from('especialidades')
+      .select('nombre')
+      .then(({ data, error }) => {
+        if (!error && data) {
+          this.especialidades = data.map((e: any) => e.nombre);
+          this.especialidades.push('Otra');
+        }
+      });
+  }
+
 
   validarEspecialidad(control: AbstractControl): ValidationErrors | null {
     const tipo = this.tipoUsuario;
@@ -78,49 +85,45 @@ export class RegisterComponent implements OnInit {
     return null;
   }
 
- onTipoUsuarioChange(tipo: string) {
-  this.tipoUsuario = tipo;
+  onTipoUsuarioChange(tipo: string) {
+    this.tipoUsuario = tipo;
 
-  const obraSocial = this.form.get('obraSocial');
-  const especialidadSeleccionada = this.form.get('especialidadSeleccionada');
-  const especialidadPersonalizada = this.form.get('especialidadPersonalizada');
+    const obraSocial = this.form.get('obraSocial');
+    const especialidadSeleccionada = this.form.get('especialidadSeleccionada');
+    const especialidadPersonalizada = this.form.get('especialidadPersonalizada');
 
-  // Reset y limpiar validadores
-  obraSocial?.clearValidators();
-  especialidadSeleccionada?.clearValidators();
-  especialidadPersonalizada?.clearValidators();
+    obraSocial?.clearValidators();
+    especialidadSeleccionada?.clearValidators();
+    especialidadPersonalizada?.clearValidators();
 
-  if (tipo === 'paciente') {
-    obraSocial?.setValidators([
-      Validators.required,
-      Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/)
-    ]);
+    if (tipo === 'paciente') {
+      obraSocial?.setValidators([
+        Validators.required,
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/)
+      ]);
+    }
+
+    if (tipo === 'especialista') {
+      especialidadSeleccionada?.setValidators([Validators.required]);
+      especialidadSeleccionada?.valueChanges.subscribe(value => {
+        if (value === 'Otra') {
+          especialidadPersonalizada?.setValidators([
+            Validators.required,
+            Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/)
+          ]);
+        } else {
+          especialidadPersonalizada?.clearValidators();
+          especialidadPersonalizada?.reset();
+        }
+        especialidadPersonalizada?.updateValueAndValidity();
+      });
+    }
+
+    obraSocial?.updateValueAndValidity();
+    especialidadSeleccionada?.updateValueAndValidity();
+    especialidadPersonalizada?.updateValueAndValidity();
+    this.form.updateValueAndValidity();
   }
-
-  if (tipo === 'especialista') {
-    especialidadSeleccionada?.setValidators([Validators.required]);
-
-    especialidadSeleccionada?.valueChanges.subscribe(value => {
-      if (value === 'Otra') {
-        especialidadPersonalizada?.setValidators([
-          Validators.required,
-          Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/)
-        ]);
-      } else {
-        especialidadPersonalizada?.clearValidators();
-        especialidadPersonalizada?.reset();
-      }
-      especialidadPersonalizada?.updateValueAndValidity();
-    });
-  }
-
-  // Importante: actualizar estado del campo
-  obraSocial?.updateValueAndValidity();
-  especialidadSeleccionada?.updateValueAndValidity();
-  especialidadPersonalizada?.updateValueAndValidity();
-  this.form.updateValueAndValidity();
-}
-
 
   onFoto1Selected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -164,32 +167,52 @@ export class RegisterComponent implements OnInit {
     this.errorMessage = '';
     const { email, password } = this.form.value;
 
-    // ✅ Intentar registrar con Supabase y capturar si el correo ya está registrado
     const { data, error } = await this.supabaseService.client.auth.signUp({ email, password });
 
     if (error) {
-      if (error.message.toLowerCase().includes('user already registered')) {
-        this.errorMessage = 'Este correo ya está registrado. Probá con otro.';
-      } else {
-        this.errorMessage = 'Error: ' + error.message;
-      }
       this.isLoading = false;
+      if (error.message.toLowerCase().includes('user already registered')) {
+        this.errorMessage = 'Este correo ya está registrado en el sistema.';
+      } else {
+        this.errorMessage = 'Error al registrar el usuario: ' + error.message;
+      }
       return;
     }
 
     const { foto1_url, foto2_url } = await this.saveFile(email);
 
     if (data?.user) {
-      await this.saveUserData(data.user.id, foto1_url, foto2_url);
+      const ok = await this.saveUserData(data.user.id, foto1_url, foto2_url);
+      if (!ok) {
+        this.isLoading = false;
+        return;
+      }
       this.router.navigate(['/login']);
     }
 
     this.isLoading = false;
   }
 
-  async saveUserData(userId: string, foto1_url: string | null, foto2_url: string | null) {
-    const values = this.form.value;
+  async saveUserData(userId: string, foto1_url: string | null, foto2_url: string | null): Promise<boolean> {
+  const values = this.form.value;
 
+  try {
+    // Validar si el email ya existe en alguna de las 3 tablas
+    const tablas = ['pacientes', 'especialistas', 'administradores'];
+    for (const tabla of tablas) {
+      const { data, error } = await this.supabaseService.client
+        .from(tabla)
+        .select('email')
+        .eq('email', values.email)
+        .maybeSingle();
+
+      if (data) {
+        this.errorMessage = `El correo ya está registrado.`;
+        return false;
+      }
+    }
+
+    // Guardar según el tipo de usuario
     switch (this.tipoUsuario) {
       case 'paciente':
         await this.supabaseService.client.from('pacientes').insert([{
@@ -243,7 +266,15 @@ export class RegisterComponent implements OnInit {
         }]);
         break;
     }
+
+    return true;
+
+  } catch (err: any) {
+    this.errorMessage = 'Error inesperado: ' + (err?.message || err);
+    return false;
   }
+}
+
 
   async saveFile(email: string): Promise<{ foto1_url: string | null, foto2_url: string | null }> {
     let foto1_url: string | null = null;

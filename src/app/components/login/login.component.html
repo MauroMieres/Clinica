@@ -1,76 +1,81 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
+<div class="full-background d-flex align-items-center justify-content-start min-vh-100 position-relative">
 
-      <h2 class="text-center mb-4">Iniciar Sesión</h2>
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner-border text-light" role="status" style="width: 4rem; height: 4rem;">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
 
-      <form #loginForm="ngForm" (ngSubmit)="login()" novalidate>
+  <div class="container position-relative z-2">
+    <div class="row justify-content-start">
+      <div class="col-md-5">
+        <div class="form-box bg-white rounded shadow p-4 w-100">
 
-        <!-- Email -->
-        <div class="mb-3">
-          <label for="username" class="form-label">Email</label>
-          <input
-            type="email"
-            id="username"
-            name="username"
-            [(ngModel)]="username"
-            class="form-control"
-            required
-            [ngClass]="{ 'is-invalid': loginForm.submitted && !username }"
-          />
-          <div class="invalid-feedback">
-            El correo es obligatorio y debe ser válido.
-          </div>
+          <h2 class="text-center mb-4">Iniciar Sesión</h2>
+
+          <form #loginForm="ngForm" (ngSubmit)="login()" novalidate>
+
+            <div class="mb-3">
+              <label for="username" class="form-label">Email</label>
+              <input
+                type="email"
+                id="username"
+                name="username"
+                [(ngModel)]="username"
+                class="form-control"
+                required
+                [ngClass]="{ 'is-invalid': loginForm.submitted && !username }"
+              />
+              <div class="invalid-feedback">
+                El correo es obligatorio y debe ser válido.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Contraseña</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                [(ngModel)]="password"
+                class="form-control"
+                required
+                minlength="6"
+                [ngClass]="{ 'is-invalid': loginForm.submitted && !password }"
+              />
+              <div class="invalid-feedback">
+                La contraseña es obligatoria.
+              </div>
+            </div>
+
+            <div *ngIf="errorMessage" class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary w-100"
+              [disabled]="loginForm.invalid"
+            >
+              Iniciar sesión
+            </button>
+
+            <div *ngIf="isLoading" class="text-center mt-3">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+              <p class="mt-2">Login en progreso, en breve será redirigido al home...</p>
+            </div>
+
+            <div class="text-center mt-3">
+              <button type="button" class="btn btn-link" (click)="autocompletar()">
+                Autocompletar
+              </button>
+            </div>
+
+          </form>
         </div>
-
-        <!-- Contraseña -->
-        <div class="mb-3">
-          <label for="password" class="form-label">Contraseña</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            [(ngModel)]="password"
-            class="form-control"
-            required
-            minlength="6"
-            [ngClass]="{ 'is-invalid': loginForm.submitted && !password }"
-          />
-          <div class="invalid-feedback">
-            La contraseña es obligatoria.
-          </div>
-        </div>
-
-        <!-- Error de login -->
-        <div *ngIf="errorMessage" class="alert alert-danger">
-          {{ errorMessage }}
-        </div>
-
-        <!-- Botón de login -->
-        <button
-          type="submit"
-          class="btn btn-primary w-100"
-          [disabled]="loginForm.invalid"
-        >
-          Iniciar sesión
-        </button>
-
-        <div *ngIf="isLoading" class="text-center mt-3">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Cargando...</span>
-                        </div>
-                        <p class="mt-2">Login en progreso, en breve será redirigido al home...</p>
-                    </div>
-
-        <!-- Botón de autocompletar (solo para testing/desarrollo) -->
-        <div class="text-center mt-2">
-          <button type="button" class="btn btn-link" (click)="autocompletar()">
-            Autocompletar
-          </button>
-        </div>
-
-      </form>
-
+      </div>
     </div>
   </div>
 </div>

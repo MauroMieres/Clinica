@@ -100,6 +100,7 @@ export class LoginComponent{
     }
 
     if (admin) {
+      console.log("local storage admin");
       localStorage.setItem('userRole', 'admin');
       this.router.navigate(['/home']);
       return;
