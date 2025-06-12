@@ -1,5 +1,18 @@
-<div class="container mt-4">
-  <h2 class="mb-4 text-center">Administración de Usuarios</h2>
+<div class="full-background d-flex align-items-center justify-content-start min-vh-100 position-relative">
+  <div class="welcome-box p-4 shadow">
+    <div class="container mt-4">
+      <!-- Título + Botón en la misma fila -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="m-0">Administración de Usuarios</h2>
+  <div>
+    <button class="btn btn-success me-2" [routerLink]="['/register']" [queryParams]="{ admin: true }">
+      + Crear Usuario
+    </button>
+    <button class="btn btn-secondary" routerLink="/home">
+      ← Volver al Home
+    </button>
+  </div>
+</div>
 
   <div class="row">
     <!-- Pacientes -->
@@ -34,5 +47,7 @@
         </li>
       </ul>
     </div>
+  </div>
+</div>
   </div>
 </div>

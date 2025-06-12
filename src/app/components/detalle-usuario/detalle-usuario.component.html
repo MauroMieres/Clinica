@@ -1,11 +1,15 @@
-<div class="container mt-4">
-  <h2 class="text-center">Detalle del Usuario</h2>
+<div class="full-background d-flex align-items-center justify-content-start min-vh-100 position-relative">
+  <div class="welcome-box p-4 shadow">
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="m-0">Detalle del Usuario</h2>
+  <button class="btn btn-secondary" (click)="volver()">
+    ← Volver
+  </button>
+</div>
 
-   <button class="btn btn-secondary mb-3" (click)="volver()">
-  ← Volver
-</button>
 
   <div class="card p-3">
+    <p><strong>Tipo:</strong> {{ tipo }}</p>
     <p><strong>Nombre:</strong> {{ usuario?.nombre }}</p>
     <p><strong>Apellido:</strong> {{ usuario?.apellido }}</p>
     <p><strong>DNI:</strong> {{ usuario?.dni }}</p>

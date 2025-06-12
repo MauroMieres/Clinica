@@ -1,11 +1,12 @@
-<div class="container mt-5">
-  <h1 class="mb-4">Bienvenido a la Clínica</h1>
-
-  <button
-    *ngIf="userRole === 'admin'"
-    class="btn btn-primary"
-    routerLink="/usuarios"
-  >
-    Ir a sección de usuarios
-  </button>
+<div class="full-background d-flex align-items-center justify-content-start min-vh-100 position-relative">
+  <div class="welcome-box p-4 shadow">
+    <h1 class="mb-4">Bienvenido</h1>
+    <button
+      *ngIf="userRole === 'admin'"
+      class="btn btn-primary"
+      routerLink="/usuarios"
+    >
+      Ir a sección de usuarios
+    </button>
+  </div>
 </div>

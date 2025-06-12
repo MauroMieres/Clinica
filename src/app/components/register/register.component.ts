@@ -10,6 +10,8 @@ import {
   ValidationErrors
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+
 
 @Component({
   selector: 'app-register',
@@ -32,10 +34,16 @@ export class RegisterComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private supabaseService: SupabaseService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute // agregado
   ) {}
 
   ngOnInit(): void {
+
+     this.route.queryParams.subscribe(params => {
+    this.mostrarAdmin = params['admin'] === 'true';
+  });
+
     this.obtenerEspecialidades();
 
     this.form = this.fb.group({
@@ -187,7 +195,11 @@ export class RegisterComponent implements OnInit {
         this.isLoading = false;
         return;
       }
-      this.router.navigate(['/login']);
+      if(this.mostrarAdmin){
+          this.router.navigate(['/usuarios']);
+      }else{
+          this.router.navigate(['/login']);
+      }
     }
 
     this.isLoading = false;
