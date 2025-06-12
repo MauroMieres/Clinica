@@ -3,7 +3,7 @@
   "public": true,
   "builds": [
     {
-      "src": "dist/clinica/browser/**",
+      "src": "dist/clinica/**",
       "use": "@vercel/static"
     }
   ],
