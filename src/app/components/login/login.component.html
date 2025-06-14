@@ -79,3 +79,22 @@
     </div>
   </div>
 </div>
+
+<div class="position-fixed bottom-0 start-0 m-3 z-3">
+  <button class="btn btn-secondary rounded-circle p-3" (click)="mostrarAccesos = !mostrarAccesos">
+    ⚡
+  </button>
+
+ <div *ngIf="mostrarAccesos" class="mt-2 bg-white rounded shadow p-2 acceso-box">
+    <p class="mb-2 fw-bold">Acceso rápido:</p>
+   <button
+  *ngFor="let usuario of accesosRapidos"
+  class="btn btn-outline-primary btn-sm w-100 mb-1 text-start d-flex justify-content-between align-items-center acceso-opcion"
+  (click)="loginRapido(usuario)"
+>
+  <span>{{ usuario.email }}</span>
+  <span class="badge text-bg-secondary">{{ usuario.tipo }}</span>
+</button>
+
+  </div>
+</div>

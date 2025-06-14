@@ -106,7 +106,6 @@ export class LoginComponent{
       return;
     }
 
-    // Si no pertenece a ninguna tabla
     this.errorMessage = 'No se pudo determinar el tipo de usuario';
     await this.supabaseService.client.auth.signOut();
     this.isLoading = false;
@@ -116,4 +115,22 @@ export class LoginComponent{
     this.username = 'mauronicolasmieres@gmail.com';
     this.password = 'cacatua';
   }
+
+  mostrarAccesos = false;
+
+accesosRapidos = [
+  { email: 'jejefo5321@lewou.com', password: 'cacatua' , tipo: 'Paciente' },
+  { email: 'bopimik481@pngzero.com', password: 'cacatua' , tipo: 'Paciente' },
+  { email: 'mauronicolasmieres@gmail.com', password: 'cacatua', tipo: 'Paciente' },
+  { email: 'sopiye2457@jio1.com', password: 'cacatua' , tipo: 'Especialista' },
+  { email: 'dokewi1447@ethsms.com', password: 'cacatua' , tipo: 'Especialista' },
+  { email: 'mnmtwittermnm@gmail.com', password: 'cacatua' , tipo: 'Administrador' },
+];
+
+loginRapido(usuario: { email: string, password: string }) {
+  this.username = usuario.email;
+  this.password = usuario.password;
+  setTimeout(() => this.login(), 100); 
+}
+
 }

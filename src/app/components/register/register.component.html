@@ -1,5 +1,4 @@
 <div class="full-background d-flex align-items-center justify-content-start min-vh-100 position-relative">
-
   <div *ngIf="isLoading" class="loading-overlay">
     <div class="spinner-border text-light" role="status" style="width: 4rem; height: 4rem;">
       <span class="visually-hidden">Cargando...</span>
@@ -14,22 +13,38 @@
           <form [formGroup]="form" (ngSubmit)="register()">
             <h2 class="mb-4">Registro</h2>
 
-            <div class="mb-3">
-              <label for="tipoUsuario" class="form-label">Tipo de Usuario</label>
-              <select id="tipoUsuario" class="form-select" formControlName="tipoUsuario" (change)="onTipoUsuarioChange(form.value.tipoUsuario)">
-                <option value="">Seleccionar...</option>
-                <option value="paciente">Paciente</option>
-                <option value="especialista">Especialista</option>
-                <option *ngIf="mostrarAdmin" value="administrador">Administrador</option>
-              </select>
-              <div *ngIf="esCampoValido('tipoUsuario')" class="text-danger">Campo obligatorio</div>
+            <!-- Botones de selección -->
+            <div *ngIf="!tipoUsuario" class="text-center animate__animated animate__fadeIn">
+              <p class="mb-3">Seleccioná tu perfil para registrarte:</p>
+
+              <!-- Paciente -->
+              <button type="button" class="btn btn-outline-primary w-100 mb-3 d-flex align-items-center justify-content-start"
+                      (click)="seleccionarTipo('paciente')">
+                <img src="https://jiwshjrecqfnhgnziubk.supabase.co/storage/v1/object/public/imagenes/sitioWeb/paciente.png" alt="Paciente" class="me-3" style="width: 40px; height: 40px;" />
+                <strong>Registrarme como Paciente</strong>
+              </button>
+
+              <!-- Especialista -->
+              <button type="button" class="btn btn-outline-success w-100 d-flex align-items-center justify-content-start"
+                      (click)="seleccionarTipo('especialista')">
+                <img src="https://jiwshjrecqfnhgnziubk.supabase.co/storage/v1/object/public/imagenes/sitioWeb/especialista.png" alt="Especialista" class="me-3" style="width: 40px; height: 40px;" />
+                <strong>Registrarme como Especialista</strong>
+              </button>
             </div>
 
-            <div *ngIf="tipoUsuario === ''" class="alert alert-info">
-              Seleccioná el tipo de usuario para continuar con el registro.
-            </div>
+          <!-- Formulario -->
+<div *ngIf="mostrarFormulario"
+     [ngClass]="{
+       'animate__animated': true,
+       'animate__fadeIn': !animandoSalida,
+       'animate__fadeOut': animandoSalida
+     }">
+  <div class="mb-3">
+    <button type="button" class="btn btn-sm btn-link" (click)="volverASeleccionar()">
+      ← Cambiar tipo de usuario
+    </button>
+  </div>
 
-            <div *ngIf="tipoUsuario !== ''">
               <div class="mb-3">
                 <label for="email" class="form-label">Correo</label>
                 <input id="email" type="email" class="form-control" formControlName="email" />
@@ -66,6 +81,7 @@
                 <div *ngIf="esCampoValido('dni')" class="text-danger">DNI inválido, solo números.</div>
               </div>
 
+              <!-- Paciente -->
               <div *ngIf="tipoUsuario === 'paciente'">
                 <div class="mb-3">
                   <label class="form-label">Obra Social</label>
@@ -84,29 +100,47 @@
                 </div>
               </div>
 
+              <!-- Especialista -->
               <div *ngIf="tipoUsuario === 'especialista'">
                 <div class="mb-3">
-                  <label class="form-label">Especialidad</label>
-                  <select class="form-select" formControlName="especialidadSeleccionada">
-                    <option value="">Seleccionar...</option>
-                    <option *ngFor="let esp of especialidades" [value]="esp">{{ esp }}</option>
-                  </select>
-                  <div *ngIf="esCampoValido('especialidadSeleccionada')" class="text-danger">Campo obligatorio.</div>
+                  <label class="form-label">Especialidades</label>
+                  <div *ngFor="let esp of especialidades">
+                    <input
+                      type="checkbox"
+                      [value]="esp"
+                      (change)="onEspecialidadToggle($event)"
+                      [checked]="especialidadesSeleccionadas.includes(esp)"
+                    /> {{ esp }}
+                  </div>
+
+                  <div class="mt-2">
+                    <label class="form-label">Agregar especialidad personalizada</label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        class="form-control"
+                        [(ngModel)]="nuevaEspecialidad"
+                        [ngModelOptions]="{standalone: true}"
+                        name="nuevaEspecialidad"
+                      />
+                      <button
+                        class="btn btn-outline-primary"
+                        type="button"
+                        (click)="agregarEspecialidadPersonalizada()"
+                      >
+                        Agregar
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="mt-2">
+                    <span *ngFor="let esp of especialidadesSeleccionadas" class="badge bg-primary me-1">
+                      {{ esp }}
+                      <span class="ms-1 text-white" style="cursor:pointer;" (click)="quitarEspecialidad(esp)">x</span>
+                    </span>
+                  </div>
                 </div>
 
-                <div *ngIf="form.value.especialidadSeleccionada === 'Otra'" class="mb-3">
-                  <label class="form-label">Especialidad Personalizada</label>
-                  <input type="text" class="form-control" formControlName="especialidadPersonalizada" />
-                  <div *ngIf="esCampoValido('especialidadPersonalizada')" class="text-danger">Campo obligatorio, solo letras.</div>
-                </div>
-
-                <div class="mb-3">
-                  <label class="form-label">Foto de perfil</label>
-                  <input type="file" class="form-control" (change)="onFoto1Selected($event)" accept="image/*" />
-                </div>
-              </div>
-
-              <div *ngIf="tipoUsuario === 'administrador'">
                 <div class="mb-3">
                   <label class="form-label">Foto de perfil</label>
                   <input type="file" class="form-control" (change)="onFoto1Selected($event)" accept="image/*" />
@@ -115,12 +149,13 @@
 
               <div *ngIf="errorMessage" class="text-danger mt-3">{{ errorMessage }}</div>
 
-              <button type="submit" class="btn btn-primary mt-3" [disabled]="!formularioCompleto() || isLoading">
+              <button type="submit" class="btn btn-primary mt-3">
                 <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                 {{ isLoading ? 'Registrando...' : 'Registrarse' }}
               </button>
             </div>
           </form>
+
         </div>
       </div>
     </div>

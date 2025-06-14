@@ -29,3 +29,23 @@
 .z-2 {
   z-index: 2 !important;
 }
+
+.btn-floating {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 24px;
+}
+
+.acceso-box {
+  max-width: 400px;
+}
+
+.acceso-opcion {
+  transition: transform 0.2s ease-in-out;
+}
+
+.acceso-opcion:hover {
+  transform: scale(1.05);
+  z-index: 2;
+}
