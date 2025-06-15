@@ -17,6 +17,8 @@ export class DetalleUsuarioComponent implements OnInit {
   campoActivo: string = '';
   cargando = false;
   mostrarConfirmacion: boolean = false;
+  especialidades: string[] = [];
+
 
   constructor(private router: Router, private supabase: SupabaseService) {
     const navigation = this.router.getCurrentNavigation();
@@ -25,6 +27,20 @@ export class DetalleUsuarioComponent implements OnInit {
       this.tipo = navigation.extras.state['tipo'];
     }
   }
+
+  async cargarEspecialidades(idEspecialista: number) {
+  const { data, error } = await this.supabase.client
+    .from('especialista_especialidad')
+    .select('especialidades(nombre)')
+    .eq('especialista_id', idEspecialista);
+
+  if (!error && data) {
+    this.especialidades = data.map((d: any) => d.especialidades.nombre);
+  } else {
+    console.error('Error al cargar especialidades:', error);
+  }
+}
+
 
   ngOnInit(): void {
       // 🔍 Mostrar payload completo en consola
@@ -41,6 +57,10 @@ export class DetalleUsuarioComponent implements OnInit {
         this.campoActivo = 'paciente_activo';
         break;
       case 'especialista':
+        if (this.tipo === 'especialista') {
+  this.cargarEspecialidades(this.usuario.id);
+}
+
         this.campoActivo = 'especialista_activo';
         break;
       case 'administrador':

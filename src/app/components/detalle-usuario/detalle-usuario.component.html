@@ -21,7 +21,13 @@
     </div>
 
     <div *ngIf="tipo === 'especialista'">
-      <p><strong>Especialidad:</strong> {{ usuario.especialidad }}</p>
+     <p><strong>Especialidades:</strong>
+  <span *ngIf="especialidades.length > 0; else sinEspecialidades">
+    {{ especialidades.join(', ') }}
+  </span>
+  <ng-template #sinEspecialidades>No asignadas</ng-template>
+</p>
+
     </div>
 
  <div class="row mt-3">

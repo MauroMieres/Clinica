@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './components/guards/auth.guard';
 import { AdminGuard } from './components/guards/admin.guard';
+import { EsEspecialistaGuard } from './components/guards/es-especialista.guard';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' }, //por ahora redirigimos a register
@@ -21,6 +22,12 @@ export const routes: Routes = [
     loadComponent: () => import('./components/detalle-usuario/detalle-usuario.component').then(m => m.DetalleUsuarioComponent),
     canActivate: [AdminGuard]
   },
+  {
+  path: 'mi-perfil',
+  loadComponent: () => import('./components/especialista/mi-perfil-horarios.component').then(m => m.MiPerfilHorariosComponent),
+  canActivate: [EsEspecialistaGuard] 
+},
+
 
     { path: '**', redirectTo: '/login' },
 ];
