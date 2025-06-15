@@ -32,6 +32,17 @@
               </button>
             </div>
 
+  <div *ngIf="mostrarAdmin" class="border rounded mt-4 p-3 bg-light">
+    <p class="mb-2 text-start"><strong>Crear nuevo administrador:</strong></p>
+    <button type="button" class="btn btn-outline-dark w-100 d-flex align-items-center justify-content-start"
+            (click)="seleccionarTipo('administrador')">
+      <img src="https://jiwshjrecqfnhgnziubk.supabase.co/storage/v1/object/public/imagenes/sitioWeb/administrador.jpg"
+           alt="Admin" class="me-3" style="width: 40px; height: 40px;" />
+      <strong>Crear Administrador</strong>
+    </button>
+  </div>
+            
+
           <!-- Formulario -->
 <div *ngIf="mostrarFormulario"
      [ngClass]="{
@@ -146,6 +157,19 @@
                   <input type="file" class="form-control" (change)="onFoto1Selected($event)" accept="image/*" />
                 </div>
               </div>
+
+              <!-- CAPTCHA -->
+<div class="mb-3">
+  <re-captcha
+    [siteKey]="'6LcU62ErAAAAAHX_LD5WKz-iX6BOA6MUesQ5x49e'" 
+    (resolved)="onCaptchaResolved($event)">
+  </re-captcha>
+
+  <div *ngIf="captchaIntentado && !captchaValido" class="text-danger mt-1">
+    Por favor, completá el captcha antes de continuar.
+  </div>
+</div>
+
 
               <div *ngIf="errorMessage" class="text-danger mt-3">{{ errorMessage }}</div>
 

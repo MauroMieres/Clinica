@@ -12,13 +12,14 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { RecaptchaModule } from 'ng-recaptcha';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
-  imports: [ReactiveFormsModule, CommonModule,FormsModule]
+  imports: [ReactiveFormsModule, CommonModule,FormsModule,RecaptchaModule]
 })
 export class RegisterComponent implements OnInit {
   form!: FormGroup;
@@ -30,7 +31,15 @@ export class RegisterComponent implements OnInit {
   especialidadesSeleccionadas: string[] = [];
   nuevaEspecialidad: string = '';
 
-  
+  captchaValido = false;
+  captchaIntentado = false;
+captchaToken: string | null = null;
+
+onCaptchaResolved(token: string | null) {
+  console.log('✅ CAPTCHA resuelto:', token);
+  this.captchaToken = token;
+  this.captchaValido = !!token;
+}
 
   foto1_file: File | null = null;
   foto2_file: File | null = null;
@@ -133,6 +142,13 @@ export class RegisterComponent implements OnInit {
   }
 
   formularioCompleto(): boolean {
+
+    this.captchaIntentado = true;
+
+if (!this.captchaValido) {
+  console.warn('⚠️ CAPTCHA no validado');
+  return false;
+}
 
  const isFormValid = true;
   const tieneFoto1 = !!this.foto1_file;
