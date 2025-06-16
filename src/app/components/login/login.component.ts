@@ -12,9 +12,9 @@ import { CommonModule, NgIf } from '@angular/common';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  username: string = "";
-  password: string = "";
-  errorMessage: string = "";
+  username: string = '';
+  password: string = '';
+  errorMessage: string = '';
   isLoading: boolean = false;
 
   constructor(
@@ -46,26 +46,24 @@ export class LoginComponent {
     const user = session.user;
     const userId = user.id;
 
-    // Buscar paciente
+    // Verificar paciente
     const { data: paciente } = await this.supabaseService.client
       .from('pacientes')
-      .select('id')
+      .select('*')
       .eq('id_auth_user', userId)
       .maybeSingle();
 
     if (paciente) {
-      localStorage.setItem('user', JSON.stringify({
-        id: paciente.id,
-        rol: 'paciente'
-      }));
+      localStorage.setItem('userRole', 'paciente');
+      localStorage.setItem('user', JSON.stringify({ id: paciente.id, rol: 'paciente' }));
       this.router.navigate(['/home']);
       return;
     }
 
-    // Buscar especialista
+    // Verificar especialista
     const { data: especialista } = await this.supabaseService.client
       .from('especialistas')
-      .select('id, especialista_activo')
+      .select('*')
       .eq('id_auth_user', userId)
       .maybeSingle();
 
@@ -77,18 +75,16 @@ export class LoginComponent {
         return;
       }
 
-      localStorage.setItem('user', JSON.stringify({
-        id: especialista.id,
-        rol: 'especialista'
-      }));
+      localStorage.setItem('userRole', 'especialista');
+      localStorage.setItem('user', JSON.stringify({ id: especialista.id, rol: 'especialista' }));
       this.router.navigate(['/home']);
       return;
     }
 
-    // Buscar administrador
+    // Verificar administrador
     const { data: admin } = await this.supabaseService.client
       .from('administradores')
-      .select('id, admin_activo')
+      .select('*')
       .eq('id_auth_user', userId)
       .maybeSingle();
 
@@ -100,10 +96,8 @@ export class LoginComponent {
         return;
       }
 
-      localStorage.setItem('user', JSON.stringify({
-        id: admin.id,
-        rol: 'admin'
-      }));
+      localStorage.setItem('userRole', 'admin');
+     localStorage.setItem('user', JSON.stringify({ id: admin.id, rol: 'admin' }));
       this.router.navigate(['/home']);
       return;
     }
@@ -121,17 +115,17 @@ export class LoginComponent {
   mostrarAccesos = false;
 
   accesosRapidos = [
-    { email: 'jejefo5321@lewou.com', password: 'cacatua', tipo: 'Paciente' },
-    { email: 'bopimik481@pngzero.com', password: 'cacatua', tipo: 'Paciente' },
+    { email: 'jejefo5321@lewou.com', password: 'cacatua' , tipo: 'Paciente' },
+    { email: 'bopimik481@pngzero.com', password: 'cacatua' , tipo: 'Paciente' },
     { email: 'mauronicolasmieres@gmail.com', password: 'cacatua', tipo: 'Paciente' },
-    { email: 'sopiye2457@jio1.com', password: 'cacatua', tipo: 'Especialista' },
-    { email: 'fiferow558@nab4.com', password: 'cacatua', tipo: 'Especialista' },
-    { email: 'mnmtwittermnm@gmail.com', password: 'cacatua', tipo: 'Administrador' },
+    { email: 'sopiye2457@jio1.com', password: 'cacatua' , tipo: 'Especialista' },
+    { email: 'fiferow558@nab4.com', password: 'cacatua' , tipo: 'Especialista' },
+    { email: 'mnmtwittermnm@gmail.com', password: 'cacatua' , tipo: 'Administrador' },
   ];
 
   loginRapido(usuario: { email: string, password: string }) {
     this.username = usuario.email;
     this.password = usuario.password;
-    setTimeout(() => this.login(), 100);
+    setTimeout(() => this.login(), 100); 
   }
 }

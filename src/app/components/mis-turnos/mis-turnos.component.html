@@ -1,3 +1,5 @@
+<div class="fondo-clinica">
+  <div class="container d-flex justify-content-center align-items-center min-vh-100">
 <div class="container py-4">
   <h2 class="mb-4">Mis turnos</h2>
 
@@ -31,7 +33,10 @@
 
   <p *ngIf="turnos.length === 0">No tenés turnos registrados.</p>
 
-  <button class="btn btn-primary mt-4" (click)="abrirSolicitud()">Solicitar nuevo turno</button>
+  <button *ngIf="userRole === 'paciente'" class="btn btn-primary mt-4" (click)="abrirSolicitud()">
+  Solicitar nuevo turno
+</button>
+
 
   <div *ngIf="modoSolicitud" class="mt-5">
   <h4>Solicitar Turno</h4>

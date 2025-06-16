@@ -35,14 +35,39 @@ export class MisTurnosComponent implements OnInit {
   constructor(private supabaseService: SupabaseService) {}
 
   async ngOnInit() {
-    const localUser = JSON.parse(localStorage.getItem('user') || '{}');
-    this.userId = localUser.id;
-    this.userRole = localUser.rol;
+  const localUser = JSON.parse(localStorage.getItem('user') || '{}');
+  this.userId = localUser.id;
+  this.userRole = localUser.rol;
 
-    if (this.userRole === 'paciente') {
-      await this.cargarTurnosPaciente();
-    }
+  if (this.userRole === 'paciente') {
+    await this.cargarTurnosPaciente();
+  } else if (this.userRole === 'especialista') {
+    await this.cargarTurnosEspecialista();
   }
+}
+
+async cargarTurnosEspecialista() {
+  const { data, error } = await this.supabaseService.client
+    .from('turnos')
+    .select(`
+      *,
+      pacientes (
+        nombre,
+        apellido
+      ),
+      especialidades (
+        nombre
+      )
+    `)
+    .eq('id_especialista', this.userId)
+    .order('fecha_inicio', { ascending: true });
+
+  if (error) {
+    console.error('Error al cargar turnos del especialista:', error);
+  } else {
+    this.turnos = data || [];
+  }
+}
 
   async cargarTurnosPaciente() {
    const { data, error } = await this.supabaseService.client
