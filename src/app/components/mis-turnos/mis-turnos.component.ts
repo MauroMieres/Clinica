@@ -137,7 +137,14 @@ export class MisTurnosComponent implements OnInit {
     .eq('id_especialidad', this.especialidadSeleccionada)
     .eq('estado', 'solicitado');
 
-  const ocupados = (turnosOcupadosRaw || []).map(t => t.fecha_inicio);
+  const ocupados = (turnosOcupadosRaw || []).map(t => {
+  const fecha = new Date(t.fecha_inicio);
+  return fecha.getFullYear() + '-' +
+         String(fecha.getMonth() + 1).padStart(2, '0') + '-' +
+         String(fecha.getDate()).padStart(2, '0') + ' ' +
+         String(fecha.getHours()).padStart(2, '0') + ':' +
+         String(fecha.getMinutes()).padStart(2, '0') + ':00';
+});
 
   const posiblesTurnos: any[] = [];
   const hoy = new Date();
