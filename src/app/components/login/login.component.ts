@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { SupabaseService } from '../../../services/supabase.service';
@@ -11,13 +11,11 @@ import { CommonModule, NgIf } from '@angular/common';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent{
-
+export class LoginComponent {
   username: string = "";
   password: string = "";
   errorMessage: string = "";
   isLoading: boolean = false;
-
 
   constructor(
     private router: Router,
@@ -46,27 +44,28 @@ export class LoginComponent{
 
     const session = data.session;
     const user = session.user;
-
-    // Buscar tipo de usuario
     const userId = user.id;
 
-    // Verificar paciente
+    // Buscar paciente
     const { data: paciente } = await this.supabaseService.client
       .from('pacientes')
-      .select('*')
+      .select('id')
       .eq('id_auth_user', userId)
       .maybeSingle();
 
     if (paciente) {
-      localStorage.setItem('userRole', 'paciente');
+      localStorage.setItem('user', JSON.stringify({
+        id: paciente.id,
+        rol: 'paciente'
+      }));
       this.router.navigate(['/home']);
       return;
     }
 
-    // Verificar especialista
+    // Buscar especialista
     const { data: especialista } = await this.supabaseService.client
       .from('especialistas')
-      .select('*')
+      .select('id, especialista_activo')
       .eq('id_auth_user', userId)
       .maybeSingle();
 
@@ -78,30 +77,33 @@ export class LoginComponent{
         return;
       }
 
-      localStorage.setItem('userRole', 'especialista');
+      localStorage.setItem('user', JSON.stringify({
+        id: especialista.id,
+        rol: 'especialista'
+      }));
       this.router.navigate(['/home']);
       return;
     }
 
-    // Verificar administrador
+    // Buscar administrador
     const { data: admin } = await this.supabaseService.client
       .from('administradores')
-      .select('*')
+      .select('id, admin_activo')
       .eq('id_auth_user', userId)
       .maybeSingle();
 
-       if (admin) {
+    if (admin) {
       if (!admin.admin_activo) {
         this.errorMessage = 'Tu cuenta de admin ha sido desactivada';
         await this.supabaseService.client.auth.signOut();
         this.isLoading = false;
         return;
       }
-    }
 
-    if (admin) {
-      console.log("local storage admin");
-      localStorage.setItem('userRole', 'admin');
+      localStorage.setItem('user', JSON.stringify({
+        id: admin.id,
+        rol: 'admin'
+      }));
       this.router.navigate(['/home']);
       return;
     }
@@ -118,19 +120,18 @@ export class LoginComponent{
 
   mostrarAccesos = false;
 
-accesosRapidos = [
-  { email: 'jejefo5321@lewou.com', password: 'cacatua' , tipo: 'Paciente' },
-  { email: 'bopimik481@pngzero.com', password: 'cacatua' , tipo: 'Paciente' },
-  { email: 'mauronicolasmieres@gmail.com', password: 'cacatua', tipo: 'Paciente' },
-  { email: 'sopiye2457@jio1.com', password: 'cacatua' , tipo: 'Especialista' },
-  { email: 'dokewi1447@ethsms.com', password: 'cacatua' , tipo: 'Especialista' },
-  { email: 'mnmtwittermnm@gmail.com', password: 'cacatua' , tipo: 'Administrador' },
-];
+  accesosRapidos = [
+    { email: 'jejefo5321@lewou.com', password: 'cacatua', tipo: 'Paciente' },
+    { email: 'bopimik481@pngzero.com', password: 'cacatua', tipo: 'Paciente' },
+    { email: 'mauronicolasmieres@gmail.com', password: 'cacatua', tipo: 'Paciente' },
+    { email: 'sopiye2457@jio1.com', password: 'cacatua', tipo: 'Especialista' },
+    { email: 'fiferow558@nab4.com', password: 'cacatua', tipo: 'Especialista' },
+    { email: 'mnmtwittermnm@gmail.com', password: 'cacatua', tipo: 'Administrador' },
+  ];
 
-loginRapido(usuario: { email: string, password: string }) {
-  this.username = usuario.email;
-  this.password = usuario.password;
-  setTimeout(() => this.login(), 100); 
-}
-
+  loginRapido(usuario: { email: string, password: string }) {
+    this.username = usuario.email;
+    this.password = usuario.password;
+    setTimeout(() => this.login(), 100);
+  }
 }

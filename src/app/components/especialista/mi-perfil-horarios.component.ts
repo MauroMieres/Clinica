@@ -24,6 +24,18 @@ export class MiPerfilHorariosComponent implements OnInit {
     };
   } = {};
 
+  horariosGuardados: {
+  [dia: string]: {
+    [especialidadId: number]: {
+      hora_inicio: string;
+      hora_fin: string;
+      duracion_turno: number;
+      activo: boolean;
+    };
+  };
+} = {};
+
+
   constructor(private supabase: SupabaseService) {}
 
  async ngOnInit() {
@@ -36,6 +48,8 @@ export class MiPerfilHorariosComponent implements OnInit {
     .select('id')
     .eq('id_auth_user', id_auth_user)
     .maybeSingle();
+
+    
 
   if (!especialistaData) {
     console.warn('❌ No se encontró el especialista con este id_auth_user');
@@ -76,6 +90,22 @@ export class MiPerfilHorariosComponent implements OnInit {
       };
     }
   }
+
+  this.horariosGuardados = {};
+
+const { data: horariosCargados } = await this.supabase.client
+  .from('horarios_atencion')
+  .select('*')
+  .eq('especialista_id', especialistaId);
+
+for (const horario of horariosCargados || []) {
+  const dia = horario.dia_semana;
+  const espId = horario.especialidad_id;
+
+  if (!this.horariosGuardados[dia]) this.horariosGuardados[dia] = {};
+  this.horariosGuardados[dia][espId] = horario;
+}
+
 }
 
 

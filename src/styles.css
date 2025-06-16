@@ -1,1 +1,7 @@
-/* You can add global styles to this file, and also import other style files */
+.fondo-clinica {
+    background-image: url('https://jiwshjrecqfnhgnziubk.supabase.co/storage/v1/object/public/imagenes/sitioWeb/registro.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}

@@ -1,13 +1,13 @@
 .full-background {
-  background-image: url('https://jiwshjrecqfnhgnziubk.supabase.co/storage/v1/object/public/imagenes/sitioWeb/registro.jpg'); /* Cambiá por la ruta correcta */
+  background-image: url('https://jiwshjrecqfnhgnziubk.supabase.co/storage/v1/object/public/imagenes/sitioWeb/registro.jpg'); 
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .welcome-box {
-  background-color: rgba(255, 255, 255, 0.9); /* fondo blanco con transparencia */
+  background-color: rgba(255, 255, 255, 0.9); 
   border-radius: 10px;
-  margin-left: 5%; /* margen desde el borde izquierdo */
+  margin-left: 5%; 
   max-width: 400px;
 }

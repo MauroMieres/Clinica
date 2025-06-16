@@ -27,7 +27,9 @@ export const routes: Routes = [
   loadComponent: () => import('./components/especialista/mi-perfil-horarios.component').then(m => m.MiPerfilHorariosComponent),
   canActivate: [EsEspecialistaGuard] 
 },
-
-
+ {
+  path: 'mis-turnos',
+  loadComponent: () => import('./components/mis-turnos/mis-turnos.component').then(m => m.MisTurnosComponent),
+},
     { path: '**', redirectTo: '/login' },
 ];
