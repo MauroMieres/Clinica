@@ -30,13 +30,17 @@
           <a class="nav-link" routerLink="/register">Registro</a>
         </li>
 
-      <li *ngIf="isLoggedIn && userRole === 'especialista'" class="nav-item">
+      <!-- <li *ngIf="isLoggedIn && userRole === 'especialista'" class="nav-item">
   <a class="nav-link" routerLink="/mi-perfil">Mis horarios</a>
-</li>
+</li> -->
 
 
    <li *ngIf="isLoggedIn" class="nav-item">
           <a class="nav-link" routerLink="/mis-turnos">Mis turnos</a>
+        </li>
+
+          <li *ngIf="isLoggedIn" class="nav-item">
+          <a class="nav-link" routerLink="/mi-perfil">Mi Perfil</a>
         </li>
 
         <li *ngIf="isLoggedIn" class="nav-item">

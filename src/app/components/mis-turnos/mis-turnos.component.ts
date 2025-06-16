@@ -15,6 +15,12 @@ export class MisTurnosComponent implements OnInit {
   userId: string = '';
   userRole: string = '';
 
+  filtroEspecialidadId: number | null = null;
+filtroEspecialidadTexto: string = '';
+filtroNombreEspecialista: string = '';
+
+
+
   modoSolicitud = false;
   modoBusqueda: 'especialidad' | 'especialista' = 'especialidad';
 
@@ -66,21 +72,25 @@ async cargarTurnosEspecialista() {
     console.error('Error al cargar turnos del especialista:', error);
   } else {
     this.turnos = data || [];
+    await this.cargarEspecialidadesParaFiltro();
+    this.filtrarTurnosPorEspecialidad(); // aplicar filtro al inicio
   }
 }
+
 
   async cargarTurnosPaciente() {
    const { data, error } = await this.supabaseService.client
   .from('turnos')
   .select(`
-    *,
-    especialistas (
-      nombre
-    ),
-    especialidades (
-      nombre
-    )
-  `)
+  *,
+  especialistas (
+    nombre,
+    apellido
+  ),
+  especialidades (
+    nombre
+  )
+`)
   .eq('id_paciente', this.userId)
   .order('fecha_inicio', { ascending: true });
 
@@ -89,6 +99,8 @@ async cargarTurnosEspecialista() {
       console.error('Error al cargar turnos:', error);
     } else {
       this.turnos = data || [];
+      this.turnosFiltrados = [...this.turnos];
+
     }
   }
 
@@ -256,4 +268,63 @@ async cargarTurnosEspecialista() {
       this.cargarTurnosPaciente();
     }
   }
+
+
+async cargarEspecialidadesParaFiltro() {
+  // Extraer especialidades únicas de los turnos cargados
+  const unique = new Map();
+  this.turnos.forEach(t => {
+    if (t.especialidades) {
+      unique.set(t.id_especialidad, t.especialidades.nombre);
+    }
+  });
+
+  this.especialidades = Array.from(unique.entries()).map(([id, nombre]) => ({ id, nombre }));
+}
+
+turnosFiltrados: any[] = [];
+filtroNombrePaciente: string = '';
+
+
+filtrarTurnosPorEspecialidad() {
+  const textoEspecialidad = this.filtroEspecialidadTexto.trim().toLowerCase();
+  const textoPaciente = this.filtroNombrePaciente.trim().toLowerCase();
+  const textoEspecialista = this.filtroNombreEspecialista.trim().toLowerCase();
+
+  this.turnosFiltrados = this.turnos.filter(t => {
+    const nombreEsp = t.especialidades?.nombre?.toLowerCase() || '';
+    const nombrePaciente = (t.pacientes?.nombre + ' ' + t.pacientes?.apellido).toLowerCase();
+    const nombreEspecialista = (t.especialistas?.nombre + ' ' + t.especialistas?.apellido).toLowerCase();
+
+    const coincideEspecialidad = !textoEspecialidad || nombreEsp.includes(textoEspecialidad);
+    const coincidePaciente = this.userRole === 'especialista'
+      ? (!textoPaciente || nombrePaciente.includes(textoPaciente))
+      : true;
+    const coincideEspecialista = this.userRole === 'paciente'
+      ? (!textoEspecialista || nombreEspecialista.includes(textoEspecialista))
+      : true;
+
+    return coincideEspecialidad && coincidePaciente && coincideEspecialista;
+  });
+}
+
+async marcarComoRealizado(turno: any) {
+  const { error } = await this.supabaseService.client
+    .from('turnos')
+    .update({ estado: 'finalizado' }) // ✅ solo campo permitido
+    .eq('id', turno.id);
+
+  if (error) {
+    console.error('❌ Error al marcar como finalizado:', error);
+    alert('No se pudo actualizar el estado del turno.');
+  } else {
+    alert('Turno marcado como finalizado correctamente.');
+    this.cargarTurnosEspecialista();
+  }
+}
+
+
+
+
+
 }

@@ -1,0 +1,43 @@
+<div class="fondo-clinica">
+<div class="container py-4">
+  <h2 class="mb-4">Mi perfil</h2>
+
+  <div *ngIf="user">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <p><strong>Nombre:</strong> {{ user.nombre }}</p>
+        <p><strong>Apellido:</strong> {{ user.apellido }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+
+        <ng-container *ngIf="userRole === 'paciente'">
+          <p><strong>Obra Social:</strong> {{ user.obra_social }}</p>
+        </ng-container>
+
+        <ng-container *ngIf="userRole === 'especialista' && especialidadesDelEspecialista.length > 0">
+          <p><strong>Especialidades:</strong> {{ especialidadesDelEspecialista.join(', ') }}</p>
+        </ng-container>
+      </div>
+
+   <div class="col-md-6 text-center">
+  <!-- Paciente: dos fotos lado a lado -->
+  <ng-container *ngIf="userRole === 'paciente'">
+    <div class="d-flex justify-content-center gap-3 mb-3">
+      <img *ngIf="user.foto1_url" [src]="user.foto1_url" class="img-thumbnail" width="200" alt="Foto 1">
+      <img *ngIf="user.foto2_url" [src]="user.foto2_url" class="img-thumbnail" width="200" alt="Foto 2">
+    </div>
+  </ng-container>
+
+  <!-- Especialista: una foto -->
+  <ng-container *ngIf="userRole === 'especialista' && user.foto_url">
+    <img [src]="user.foto_url" class="img-thumbnail" width="200" alt="Foto de perfil">
+  </ng-container>
+</div>
+
+<hr *ngIf="userRole === 'especialista'" class="my-4">
+
+<app-mi-perfil-horarios *ngIf="userRole === 'especialista'"></app-mi-perfil-horarios>
+
+
+    </div>
+  </div>
+</div>

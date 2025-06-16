@@ -22,14 +22,13 @@ export const routes: Routes = [
     loadComponent: () => import('./components/detalle-usuario/detalle-usuario.component').then(m => m.DetalleUsuarioComponent),
     canActivate: [AdminGuard]
   },
-  {
-  path: 'mi-perfil',
-  loadComponent: () => import('./components/especialista/mi-perfil-horarios.component').then(m => m.MiPerfilHorariosComponent),
-  canActivate: [EsEspecialistaGuard] 
-},
  {
   path: 'mis-turnos',
   loadComponent: () => import('./components/mis-turnos/mis-turnos.component').then(m => m.MisTurnosComponent),
+},
+ {
+  path: 'mi-perfil',
+  loadComponent: () => import('./components/mi-perfil/mi-perfil.component').then(m => m.MiPerfilComponent),
 },
     { path: '**', redirectTo: '/login' },
 ];
