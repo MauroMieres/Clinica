@@ -6,24 +6,14 @@
     <div *ngIf="userRole === 'paciente'" class="row mb-4">
       <div class="col-md-6 mb-2">
         <label>Filtrar por especialidad:</label>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="filtroEspecialidadTexto"
-          (input)="filtrarTurnosPorEspecialidad()"
-          placeholder="Escribí una especialidad..."
-        >
+        <input type="text" class="form-control" [(ngModel)]="filtroEspecialidadTexto"
+          (input)="filtrarTurnosPorEspecialidad()" placeholder="Escribí una especialidad...">
       </div>
 
       <div class="col-md-6 mb-2">
         <label>Filtrar por especialista:</label>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="filtroNombreEspecialista"
-          (input)="filtrarTurnosPorEspecialidad()"
-          placeholder="Escribí el nombre o apellido del especialista..."
-        >
+        <input type="text" class="form-control" [(ngModel)]="filtroNombreEspecialista"
+          (input)="filtrarTurnosPorEspecialidad()" placeholder="Escribí el nombre o apellido del especialista...">
       </div>
     </div>
 
@@ -31,24 +21,14 @@
     <div *ngIf="userRole === 'especialista'" class="row mb-4">
       <div class="col-md-6 mb-2">
         <label>Filtrar por especialidad:</label>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="filtroEspecialidadTexto"
-          (input)="filtrarTurnosPorEspecialidad()"
-          placeholder="Escribí una especialidad..."
-        >
+        <input type="text" class="form-control" [(ngModel)]="filtroEspecialidadTexto"
+          (input)="filtrarTurnosPorEspecialidad()" placeholder="Escribí una especialidad...">
       </div>
 
       <div class="col-md-6 mb-2">
         <label>Filtrar por paciente:</label>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="filtroNombrePaciente"
-          (input)="filtrarTurnosPorEspecialidad()"
-          placeholder="Escribí el nombre o apellido del paciente..."
-        >
+        <input type="text" class="form-control" [(ngModel)]="filtroNombrePaciente"
+          (input)="filtrarTurnosPorEspecialidad()" placeholder="Escribí el nombre o apellido del paciente...">
       </div>
     </div>
 
@@ -60,7 +40,6 @@
           <th>{{ userRole === 'especialista' ? 'Paciente' : 'Especialista' }}</th>
           <th>Especialidad</th>
           <th>Estado</th>
-          <th>Reseña</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -68,51 +47,69 @@
         <tr *ngFor="let turno of turnosFiltrados">
           <td>{{ turno.fecha_inicio | date:'dd/MM HH:mm' }} a {{ turno.fecha_fin | date:'HH:mm' }}hs</td>
           <td>
-            {{ userRole === 'especialista' 
-              ? turno.pacientes?.nombre + ' ' + turno.pacientes?.apellido 
-              : turno.especialistas?.nombre + ' ' + turno.especialistas?.apellido }}
+            {{ userRole === 'especialista'
+            ? turno.pacientes?.nombre + ' ' + turno.pacientes?.apellido
+            : turno.especialistas?.nombre + ' ' + turno.especialistas?.apellido }}
           </td>
           <td>{{ turno.especialidades?.nombre }}</td>
           <td>{{ turno.estado }}</td>
-          <td>{{ turno.resena || '-' }}</td>
           <td>
-  <!-- Botón para cancelar (solo paciente, estado solicitado) -->
-  <button 
-    *ngIf="userRole === 'paciente' && turno.estado === 'solicitado'" 
-    class="btn btn-danger btn-sm me-1" 
-    (click)="cancelarTurno(turno)">
-    Cancelar
-  </button>
+            <!-- CANCELAR (Paciente) -->
+            <button *ngIf="userRole === 'paciente' && (turno.estado === 'solicitado' || turno.estado === 'aceptado')"
+              class="btn btn-danger btn-sm me-1" (click)="cancelarTurno(turno)">
+              Cancelar
+            </button>
 
-  <!-- Botón para marcar como realizado (solo especialista, estado solicitado) -->
-  <button 
-    *ngIf="userRole === 'especialista' && turno.estado === 'solicitado'" 
-    class="btn btn-success btn-sm me-1" 
-    (click)="marcarComoRealizado(turno)">
-    Marcar como realizado
-  </button>
+            <!-- VER RESEÑA (Paciente) -->
+            <button *ngIf="userRole === 'paciente' && (turno.resena || turno.nota_cancelacion)"
+              class="btn btn-info btn-sm me-1" (click)="abrirResena(turno)">
+              Ver Reseña
+            </button>
 
-  <!-- Ver reseña -->
-  <button *ngIf="userRole === 'paciente' && turno.resena"
-          class="btn btn-info btn-sm me-1">
-    Ver Reseña
-  </button>
+            <!-- CALIFICAR ATENCIÓN (Paciente) -->
+            <button *ngIf="userRole === 'paciente' && turno.estado === 'finalizado' && !turno.comentario"
+              class="btn btn-primary btn-sm" (click)="calificarAtencion(turno)">
+              Calificar Atención
+            </button>
 
-  <!-- Completar encuesta -->
-  <button *ngIf="userRole === 'paciente' && turno.estado === 'realizado' && turno.resena && !turno.encuesta_completada"
-          class="btn btn-warning btn-sm me-1">
-    Completar Encuesta
-  </button>
 
-  <!-- Calificar atención -->
-  <button *ngIf="userRole === 'paciente' && turno.estado === 'realizado' && !turno.calificacion"
-          class="btn btn-primary btn-sm">
-    Calificar Atención
-  </button>
-</td>
+            <!-- COMPLETAR ENCUESTA (Paciente) -->
+            <button
+              *ngIf="userRole === 'paciente' && turno.estado === 'finalizado' && turno.resena && !turno.encuesta_completada"
+              class="btn btn-warning btn-sm me-1" (click)="completarEncuesta(turno)">
+              Completar Encuesta
+            </button>
 
+            <!-- ESPECIALISTA: Aceptar / Rechazar -->
+            <button *ngIf="userRole === 'especialista' && turno.estado === 'solicitado'"
+              class="btn btn-success btn-sm me-1" (click)="aceptarTurno(turno)">
+              Aceptar
+            </button>
+            <button *ngIf="userRole === 'especialista' && turno.estado === 'solicitado'"
+              class="btn btn-danger btn-sm me-1" (click)="rechazarTurno(turno)">
+              Rechazar
+            </button>
+
+            <!-- Ver Reseña (solo para especialista) -->
+            <button *ngIf="userRole === 'especialista' && (turno.resena || turno.comentario || turno.nota_cancelacion)"
+              class="btn btn-info btn-sm me-1" (click)="abrirResena(turno)">
+              Ver Reseña
+            </button>
+
+
+            <!-- ESPECIALISTA: Finalizar (con reseña) y Cancelar -->
+            <button *ngIf="userRole === 'especialista' && turno.estado === 'aceptado'"
+              class="btn btn-primary btn-sm me-1" (click)="marcarComoFinalizado(turno)">
+              Finalizar
+            </button>
+            <button *ngIf="userRole === 'especialista' && turno.estado === 'aceptado'"
+              class="btn btn-danger btn-sm me-1" (click)="cancelarTurnoEspecialista(turno)">
+              Cancelar
+            </button>
+          </td>
         </tr>
       </tbody>
+
     </table>
 
     <p *ngIf="turnosFiltrados.length === 0">No tenés turnos registrados.</p>
@@ -132,20 +129,23 @@
       <!-- Buscar por especialidad -->
       <div *ngIf="modoBusqueda === 'especialidad'" class="mb-3">
         <label>Especialidad:</label>
-        <select class="form-select" [(ngModel)]="especialidadSeleccionada" (change)="cargarEspecialistasPorEspecialidad()">
+        <select class="form-select" [(ngModel)]="especialidadSeleccionada"
+          (change)="cargarEspecialistasPorEspecialidad()">
           <option *ngFor="let esp of especialidades" [value]="esp.id">{{ esp.nombre }}</option>
         </select>
 
         <label class="mt-3">Especialistas:</label>
         <select class="form-select" [(ngModel)]="especialistaSeleccionado" (change)="cargarHorariosDisponibles()">
-          <option *ngFor="let esp of especialistasFiltrados" [value]="esp.id">{{ esp.nombre }} {{ esp.apellido }}</option>
+          <option *ngFor="let esp of especialistasFiltrados" [value]="esp.id">{{ esp.nombre }} {{ esp.apellido }}
+          </option>
         </select>
       </div>
 
       <!-- Buscar por especialista -->
       <div *ngIf="modoBusqueda === 'especialista'" class="mb-3">
         <label>Especialista:</label>
-        <select class="form-select" [(ngModel)]="especialistaSeleccionado" (change)="cargarEspecialidadesPorEspecialista()">
+        <select class="form-select" [(ngModel)]="especialistaSeleccionado"
+          (change)="cargarEspecialidadesPorEspecialista()">
           <option *ngFor="let esp of especialistas" [value]="esp.id">{{ esp.nombre }} {{ esp.apellido }}</option>
         </select>
 
@@ -165,7 +165,8 @@
         </select>
       </div>
 
-      <button class="btn btn-success mt-3" [disabled]="!horarioSeleccionado" (click)="confirmarTurno()">Confirmar turno</button>
+      <button class="btn btn-success mt-3" [disabled]="!horarioSeleccionado" (click)="confirmarTurno()">Confirmar
+        turno</button>
     </div>
   </div>
 </div>

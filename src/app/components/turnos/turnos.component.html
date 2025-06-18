@@ -1,0 +1,59 @@
+<div class="container py-4">
+  <h2 class="mb-4 text-center">Turnos de la Clínica</h2>
+
+  <div class="row mb-4">
+    <div class="col-md-6 mb-2">
+      <label>Filtrar por especialidad:</label>
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="filtroEspecialidad"
+        (input)="filtrarTurnos()"
+        placeholder="Escribí una especialidad..."
+      >
+    </div>
+    <div class="col-md-6 mb-2">
+      <label>Filtrar por especialista:</label>
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="filtroEspecialista"
+        (input)="filtrarTurnos()"
+        placeholder="Escribí nombre o apellido del especialista..."
+      >
+    </div>
+  </div>
+
+  <table class="table table-bordered table-hover" *ngIf="turnosFiltrados.length > 0">
+    <thead class="table-light">
+      <tr>
+        <th>Fecha</th>
+        <th>Especialista</th>
+        <th>Especialidad</th>
+        <th>Paciente</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let turno of turnosFiltrados">
+        <td>{{ turno.fecha_inicio | date:'dd/MM HH:mm' }} a {{ turno.fecha_fin | date:'HH:mm' }}hs</td>
+        <td>{{ turno.especialistas?.nombre }} {{ turno.especialistas?.apellido }}</td>
+        <td>{{ turno.especialidades?.nombre }}</td>
+        <td>{{ turno.id_paciente }}</td>
+        <td>{{ turno.estado }}</td>
+        <td>
+  <button
+    *ngIf="turno.estado === 'solicitado'"
+    class="btn btn-danger btn-sm"
+    (click)="cancelarTurno(turno)">
+    Cancelar
+  </button>
+</td>
+
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="turnosFiltrados.length === 0">No hay turnos para mostrar.</p>
+</div>

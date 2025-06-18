@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { SupabaseService } from '../../../services/supabase.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-mis-turnos',
@@ -104,24 +105,61 @@ async cargarTurnosEspecialista() {
     }
   }
 
-  async cancelarTurno(turno: any) {
-    const nota = prompt('Ingrese el motivo de la cancelación:');
-    if (!nota) {
-      alert('Debe ingresar una nota para cancelar el turno.');
-      return;
-    }
-
-    const { error } = await this.supabaseService.client
-      .from('turnos')
-      .update({ estado: 'cancelado', nota_cancelacion: nota })
-      .eq('id', turno.id);
-
-    if (error) {
-      console.error('Error al cancelar turno:', error);
-    } else {
-      this.cargarTurnosPaciente();
-    }
+ async cancelarTurno(turno: any) {
+  if (turno.estado === 'finalizado') {
+    await Swal.fire({
+      icon: 'error',
+      title: 'No se puede cancelar un turno finalizado.',
+      confirmButtonText: 'Ok'
+    });
+    return;
   }
+
+  const { value: nota } = await Swal.fire({
+    title: 'Motivo de cancelación',
+    input: 'textarea',
+    inputLabel: 'Ingrese el motivo de la cancelación',
+    inputPlaceholder: 'Escriba aquí el motivo...',
+    inputAttributes: {
+      'aria-label': 'Escriba aquí el motivo'
+    },
+    showCancelButton: true,
+    confirmButtonText: 'Cancelar Turno',
+    cancelButtonText: 'Volver'
+  });
+
+  if (!nota || !nota.trim()) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Debe ingresar una nota para cancelar el turno.',
+      confirmButtonText: 'Ok'
+    });
+    return;
+  }
+
+  const { error } = await this.supabaseService.client
+    .from('turnos')
+    .update({ estado: 'cancelado', nota_cancelacion: nota })
+    .eq('id', turno.id);
+
+  if (error) {
+    await Swal.fire({
+      icon: 'error',
+      title: 'No se pudo cancelar el turno',
+      confirmButtonText: 'Ok'
+    });
+    console.error(error);
+  } else {
+    await Swal.fire({
+      icon: 'success',
+      title: 'Turno cancelado correctamente.',
+      confirmButtonText: 'Ok'
+    });
+    this.cargarTurnosPaciente();
+  }
+}
+
+
 
   async abrirSolicitud() {
     this.modoSolicitud = true;
@@ -235,39 +273,42 @@ async cargarTurnosEspecialista() {
 
 
   async confirmarTurno() {
+  if (!this.horarioSeleccionado?.fecha_inicio || !this.horarioSeleccionado?.fecha_fin) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Debe seleccionar un horario válido.',
+      confirmButtonText: 'Ok'
+    });
+    return;
+  }
 
-    if (!this.horarioSeleccionado?.fecha_inicio || !this.horarioSeleccionado?.fecha_fin) {
-  alert('Debe seleccionar un horario válido.');
-  return;
+  const { error } = await this.supabaseService.client.from('turnos').insert([{
+    id_paciente: this.userId,
+    id_especialista: this.especialistaSeleccionado,
+    id_especialidad: this.especialidadSeleccionada,
+    fecha_inicio: this.horarioSeleccionado.fecha_inicio,
+    fecha_fin: this.horarioSeleccionado.fecha_fin,
+    estado: 'solicitado'
+  }]);
+
+  if (error) {
+    await Swal.fire({
+      icon: 'error',
+      title: 'Hubo un error al confirmar el turno',
+      confirmButtonText: 'Ok'
+    });
+    console.error(error);
+  } else {
+    await Swal.fire({
+      icon: 'success',
+      title: 'Turno solicitado con éxito',
+      confirmButtonText: 'Ok'
+    });
+    this.modoSolicitud = false;
+    this.cargarTurnosPaciente();
+  }
 }
 
-
-    console.log('Turno a insertar:', {
-  id_paciente: this.userId,
-  id_especialista: this.especialistaSeleccionado,
-  id_especialidad: this.especialidadSeleccionada,
-  ...this.horarioSeleccionado
-});
-
-   const { error } = await this.supabaseService.client.from('turnos').insert([{
-  id_paciente: this.userId,
-  id_especialista: this.especialistaSeleccionado,
-  id_especialidad: this.especialidadSeleccionada,
-  fecha_inicio: this.horarioSeleccionado.fecha_inicio,
-  fecha_fin: this.horarioSeleccionado.fecha_fin,
-  estado: 'solicitado'
-}]);
-
-
-    if (error) {
-      alert('Hubo un error al confirmar el turno');
-      console.error(error);
-    } else {
-      alert('Turno solicitado con éxito');
-      this.modoSolicitud = false;
-      this.cargarTurnosPaciente();
-    }
-  }
 
 
 async cargarEspecialidadesParaFiltro() {
@@ -311,19 +352,344 @@ filtrarTurnosPorEspecialidad() {
 async marcarComoRealizado(turno: any) {
   const { error } = await this.supabaseService.client
     .from('turnos')
-    .update({ estado: 'finalizado' }) // ✅ solo campo permitido
+    .update({ estado: 'finalizado' })
     .eq('id', turno.id);
 
   if (error) {
+    await Swal.fire({
+      icon: 'error',
+      title: 'No se pudo actualizar el estado del turno.',
+      confirmButtonText: 'Ok'
+    });
     console.error('❌ Error al marcar como finalizado:', error);
-    alert('No se pudo actualizar el estado del turno.');
   } else {
-    alert('Turno marcado como finalizado correctamente.');
+    await Swal.fire({
+      icon: 'success',
+      title: 'Turno marcado como finalizado correctamente.',
+      confirmButtonText: 'Ok'
+    });
     this.cargarTurnosEspecialista();
   }
 }
 
 
+async aceptarTurno(turno: any) {
+  const { error } = await this.supabaseService.client
+    .from('turnos')
+    .update({ estado: 'aceptado' })
+    .eq('id', turno.id);
+
+  if (error) {
+    await Swal.fire({
+      icon: 'error',
+      title: 'No se pudo aceptar el turno',
+      confirmButtonText: 'Ok'
+    });
+    console.error(error);
+  } else {
+    await Swal.fire({
+      icon: 'success',
+      title: 'Turno aceptado correctamente.',
+      confirmButtonText: 'Ok'
+    });
+    this.cargarTurnosEspecialista();
+  }
+}
+
+
+async rechazarTurno(turno: any) {
+  const { value: motivo } = await Swal.fire({
+    title: 'Motivo de rechazo',
+    input: 'textarea',
+    inputLabel: 'Ingrese el motivo del rechazo',
+    inputPlaceholder: 'Escriba aquí el motivo...',
+    showCancelButton: true,
+    confirmButtonText: 'Rechazar turno',
+    cancelButtonText: 'Volver'
+  });
+
+  if (!motivo || !motivo.trim()) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Debe ingresar un motivo.',
+      confirmButtonText: 'Ok'
+    });
+    return;
+  }
+
+  const { error } = await this.supabaseService.client
+    .from('turnos')
+    .update({ estado: 'rechazado', nota_cancelacion: motivo })
+    .eq('id', turno.id);
+
+  if (error) {
+    await Swal.fire({
+      icon: 'error',
+      title: 'No se pudo rechazar el turno',
+      confirmButtonText: 'Ok'
+    });
+    console.error(error);
+  } else {
+    await Swal.fire({
+      icon: 'success',
+      title: 'Turno rechazado correctamente.',
+      confirmButtonText: 'Ok'
+    });
+    this.cargarTurnosEspecialista();
+  }
+}
+
+
+async cancelarTurnoEspecialista(turno: any) {
+  if (turno.estado !== 'aceptado' && turno.estado !== 'solicitado') {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Solo se puede cancelar turnos en estado solicitado o aceptado.',
+      confirmButtonText: 'Ok'
+    });
+    return;
+  }
+  const { value: comentario } = await Swal.fire({
+    title: 'Motivo de la cancelación',
+    input: 'textarea',
+    inputLabel: 'Ingrese el motivo de la cancelación',
+    inputPlaceholder: 'Escriba aquí el motivo...',
+    showCancelButton: true,
+    confirmButtonText: 'Cancelar turno',
+    cancelButtonText: 'Volver'
+  });
+  if (!comentario || !comentario.trim()) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Debe ingresar un motivo para cancelar el turno.',
+      confirmButtonText: 'Ok'
+    });
+    return;
+  }
+
+  const { error } = await this.supabaseService.client
+    .from('turnos')
+    .update({ estado: 'cancelado', nota_cancelacion: comentario })
+    .eq('id', turno.id);
+
+  if (error) {
+    await Swal.fire({
+      icon: 'error',
+      title: 'No se pudo cancelar el turno.',
+      confirmButtonText: 'Ok'
+    });
+    console.error(error);
+  } else {
+    await Swal.fire({
+      icon: 'success',
+      title: 'Turno cancelado correctamente.',
+      confirmButtonText: 'Ok'
+    });
+    this.cargarTurnosEspecialista();
+  }
+}
+
+
+async marcarComoFinalizado(turno: any) {
+  if (turno.estado !== 'aceptado') {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Solo se puede finalizar turnos aceptados.',
+      confirmButtonText: 'Ok'
+    });
+    return;
+  }
+
+  // Pedir la reseña
+  const { value: resena } = await Swal.fire({
+    title: 'Reseña del turno',
+    input: 'textarea',
+    inputLabel: 'Describa la atención, diagnóstico, indicaciones, etc.',
+    inputPlaceholder: 'Escriba aquí la reseña médica...',
+    inputAttributes: {
+      'aria-label': 'Escriba aquí la reseña'
+    },
+    showCancelButton: true,
+    confirmButtonText: 'Finalizar turno',
+    cancelButtonText: 'Volver'
+  });
+
+  if (!resena || !resena.trim()) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Debe ingresar una reseña para finalizar el turno.',
+      confirmButtonText: 'Ok'
+    });
+    return;
+  }
+
+  // Guardar la reseña junto con el cambio de estado
+  const { error } = await this.supabaseService.client
+    .from('turnos')
+    .update({ estado: 'finalizado', resena: resena })
+    .eq('id', turno.id);
+
+  if (error) {
+    await Swal.fire({
+      icon: 'error',
+      title: 'No se pudo finalizar el turno.',
+      confirmButtonText: 'Ok'
+    });
+    console.error(error);
+  } else {
+    await Swal.fire({
+      icon: 'success',
+      title: 'Turno finalizado correctamente.',
+      confirmButtonText: 'Ok'
+    });
+    this.cargarTurnosEspecialista();
+  }
+}
+
+
+
+abrirResena(turno: any) {
+  let html = '';
+  if (turno.resena) {
+    html += `<div><strong>Reseña médica:</strong><br>${turno.resena}</div>`;
+  }
+  if (turno.comentario) {
+    html += `<div class="mt-2"><strong>Comentario del paciente:</strong><br>${turno.comentario}</div>`;
+  }
+  if (turno.nota_cancelacion) {
+    html += `<div class="mt-2"><strong>Motivo de cancelación/rechazo:</strong><br>${turno.nota_cancelacion}</div>`;
+  }
+  if (!html) {
+    html = '<i>No hay reseña ni comentarios disponibles.</i>';
+  }
+
+  Swal.fire({
+    title: 'Detalles del Turno',
+    html,
+    icon: 'info',
+    confirmButtonText: 'Cerrar',
+    customClass: {
+      htmlContainer: 'text-start'
+    }
+  });
+}
+
+
+async completarEncuesta(turno: any) {
+  // 1. Paso: elige estrellas y escribe texto en un SweetAlert custom
+  const { value: formValues } = await Swal.fire({
+    title: 'Completar encuesta',
+    html: `
+      <div style="margin-bottom:10px;">
+        <label style="display:block;margin-bottom:5px;">Calificá la atención:</label>
+        <div id="star-rating" style="font-size:2rem; color: #ffc107;">
+          <span class="swal-star" data-value="1">&#9733;</span>
+          <span class="swal-star" data-value="2">&#9733;</span>
+          <span class="swal-star" data-value="3">&#9733;</span>
+          <span class="swal-star" data-value="4">&#9733;</span>
+          <span class="swal-star" data-value="5">&#9733;</span>
+        </div>
+      </div>
+      <textarea id="encuesta-text" class="swal2-textarea" placeholder="Escribí tu opinión..." style="width:100%"></textarea>
+    `,
+    focusConfirm: false,
+    preConfirm: async () => {
+      const estrellas = (document.querySelector('.swal-star.selected:last-of-type') as HTMLElement)?.getAttribute('data-value');
+      const encuesta = (document.getElementById('encuesta-text') as HTMLTextAreaElement).value;
+      if (!estrellas) {
+        Swal.showValidationMessage('Debés seleccionar una calificación (estrellas)');
+        return false;
+      }
+      if (!encuesta || encuesta.trim().length < 5) {
+        Swal.showValidationMessage('Escribí al menos 5 caracteres en la encuesta');
+        return false;
+      }
+      return { estrellas: parseInt(estrellas), encuesta };
+    },
+    didOpen: () => {
+      // Logica de estrellas clickeables
+      const stars = Array.from(document.querySelectorAll('.swal-star')) as HTMLElement[];
+      stars.forEach((star, i) => {
+        star.addEventListener('mouseenter', () => {
+          stars.forEach((s, j) => s.style.color = j <= i ? '#ffc107' : '#e4e5e9');
+        });
+        star.addEventListener('mouseleave', () => {
+          const selected = document.querySelectorAll('.swal-star.selected').length;
+          stars.forEach((s, j) => s.style.color = j < selected ? '#ffc107' : '#e4e5e9');
+        });
+        star.addEventListener('click', () => {
+          stars.forEach((s, j) => {
+            if (j <= i) s.classList.add('selected');
+            else s.classList.remove('selected');
+            s.style.color = j <= i ? '#ffc107' : '#e4e5e9';
+          });
+        });
+      });
+    },
+    showCancelButton: true,
+    confirmButtonText: 'Enviar',
+    cancelButtonText: 'Cancelar'
+  });
+
+  if (formValues) {
+    // 2. Paso: guardar en Supabase
+    const { error } = await this.supabaseService.client
+      .from('encuestas')
+      .insert([{
+        id_turno: turno.id,
+        encuesta: formValues.encuesta,
+        estrellas: formValues.estrellas
+      }]);
+    if (error) {
+      await Swal.fire('Error', 'No se pudo guardar la encuesta', 'error');
+      return;
+    }
+    // 3. (Opcional) marcar en el turno que fue completada la encuesta
+    await this.supabaseService.client
+      .from('turnos')
+      .update({ encuesta_completada: true })
+      .eq('id', turno.id);
+
+    await Swal.fire('¡Gracias!', 'Tu encuesta fue enviada con éxito.', 'success');
+    this.cargarTurnosPaciente(); // refresca el listado
+  }
+}
+
+async calificarAtencion(turno: any) {
+  const { value: comentario } = await Swal.fire({
+    title: 'Calificar atención',
+    input: 'textarea',
+    inputLabel: '¿Cómo fue la atención?',
+    inputPlaceholder: 'Escribí tu comentario sobre la atención recibida...',
+    inputAttributes: {
+      'aria-label': 'Escribí tu comentario'
+    },
+    showCancelButton: true,
+    confirmButtonText: 'Enviar',
+    cancelButtonText: 'Cancelar'
+  });
+
+  if (!comentario || !comentario.trim()) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Debe ingresar un comentario para calificar la atención.',
+      confirmButtonText: 'Ok'
+    });
+    return;
+  }
+
+  const { error } = await this.supabaseService.client
+    .from('turnos')
+    .update({ comentario: comentario.trim() })
+    .eq('id', turno.id);
+
+  if (error) {
+    await Swal.fire('Error', 'No se pudo guardar el comentario.', 'error');
+  } else {
+    await Swal.fire('¡Gracias!', 'Tu comentario fue enviado con éxito.', 'success');
+    this.cargarTurnosPaciente(); // refresca la lista
+  }
+}
 
 
 

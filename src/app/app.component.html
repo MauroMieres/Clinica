@@ -16,37 +16,42 @@
     
 
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
+     <ul class="navbar-nav ms-auto">
+  <li *ngIf="isLoggedIn" class="nav-item">
+    <a class="nav-link" routerLink="/home">Home</a>
+  </li>
 
-<li class="nav-item">
-        <li *ngIf="isLoggedIn" class="nav-item">
-  <a class="nav-link" routerLink="/home">Home</a>
-</li>
+  <li *ngIf="!isLoggedIn" class="nav-item">
+    <a class="nav-link" routerLink="/login">Login</a>
+  </li>
+  <li *ngIf="!isLoggedIn" class="nav-item">
+    <a class="nav-link" routerLink="/register">Registro</a>
+  </li>
 
-        <li *ngIf="!isLoggedIn" class="nav-item">
-          <a class="nav-link" routerLink="/login">Login</a>
-        </li>
-        <li *ngIf="!isLoggedIn" class="nav-item">
-          <a class="nav-link" routerLink="/register">Registro</a>
-        </li>
+  <!-- ACCESO A SOLICITAR TURNOS: Solo para pacientes y admin -->
+  <li *ngIf="isLoggedIn && (userRole === 'paciente' || userRole === 'admin')" class="nav-item">
+    <a class="nav-link" routerLink="/solicitar-turnos">Solicitar Turnos</a>
+  </li>
 
-      <!-- <li *ngIf="isLoggedIn && userRole === 'especialista'" class="nav-item">
-  <a class="nav-link" routerLink="/mi-perfil">Mis horarios</a>
-</li> -->
+  <!-- MIS TURNOS: Solo paciente y especialista -->
+  <li *ngIf="isLoggedIn && (userRole === 'paciente' || userRole === 'especialista')" class="nav-item">
+    <a class="nav-link" routerLink="/mis-turnos">Mis turnos</a>
+  </li>
 
+  <!-- TODOS LOS TURNOS: Solo admin -->
+  <li *ngIf="isLoggedIn && userRole === 'admin'" class="nav-item">
+    <a class="nav-link" routerLink="/turnos">Turnos</a>
+  </li>
 
-   <li *ngIf="isLoggedIn" class="nav-item">
-          <a class="nav-link" routerLink="/mis-turnos">Mis turnos</a>
-        </li>
+  <li *ngIf="isLoggedIn" class="nav-item">
+    <a class="nav-link" routerLink="/mi-perfil">Mi Perfil</a>
+  </li>
 
-          <li *ngIf="isLoggedIn" class="nav-item">
-          <a class="nav-link" routerLink="/mi-perfil">Mi Perfil</a>
-        </li>
+  <li *ngIf="isLoggedIn" class="nav-item">
+    <button class="btn btn-outline-danger" (click)="logout()">Cerrar sesión</button>
+  </li>
+</ul>
 
-        <li *ngIf="isLoggedIn" class="nav-item">
-          <button class="btn btn-outline-danger" (click)="logout()">Cerrar sesión</button>
-        </li>
-      </ul>
     </div>
   </div>
 </nav>
