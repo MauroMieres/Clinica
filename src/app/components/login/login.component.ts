@@ -56,7 +56,9 @@ export class LoginComponent {
     if (paciente) {
       localStorage.setItem('userRole', 'paciente');
       localStorage.setItem('user', JSON.stringify({ id: paciente.id, rol: 'paciente' }));
-      this.router.navigate(['/home']);
+      this.router.navigate(['/home']).then(() => {
+    window.location.reload();
+  });
       return;
     }
 
@@ -77,7 +79,9 @@ export class LoginComponent {
 
       localStorage.setItem('userRole', 'especialista');
       localStorage.setItem('user', JSON.stringify({ id: especialista.id, rol: 'especialista' }));
-      this.router.navigate(['/home']);
+      this.router.navigate(['/home']).then(() => {
+    window.location.reload();
+  });
       return;
     }
 
@@ -98,7 +102,9 @@ export class LoginComponent {
 
       localStorage.setItem('userRole', 'admin');
      localStorage.setItem('user', JSON.stringify({ id: admin.id, rol: 'admin' }));
-      this.router.navigate(['/home']);
+     this.router.navigate(['/home']).then(() => {
+    window.location.reload();
+  });
       return;
     }
 

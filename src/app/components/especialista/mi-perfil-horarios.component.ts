@@ -133,61 +133,48 @@ async guardarHorarios() {
     const rangos: { inicio: string; fin: string }[] = [];
 
     for (const esp of this.especialidades) {
-      const h = this.horarios[dia][esp.id];
-      if (!h.activo) continue;
+  const h = this.horarios[dia][esp.id];
+  if (!h.activo) continue;
 
-      const ini = h.hora_inicio;
-      const fin = h.hora_fin;
-      const duracion = h.duracion_turno;
+  // 🚩 VALIDAR ANTES DE GUARDAR
+  const error = this.validarHorario(dia, h.hora_inicio, h.hora_fin, h.duracion_turno);
+  if (error) {
+    alert(`${dia} - ${esp.nombre}: ${error}`);
+    return; // 🚨 FRENÁ EL GUARDADO
+  }
 
-      if (!ini || !fin) {
-        alert(`⛔ Completá los campos de horario para ${dia} - ${esp.nombre}`);
-        return;
-      }
+  const ini = h.hora_inicio;
+  const fin = h.hora_fin;
+  const duracion = h.duracion_turno;
 
-      if (ini >= fin) {
-        alert(`⛔ El horario de fin debe ser mayor al de inicio en ${dia} - ${esp.nombre}`);
-        return;
-      }
+  // ...todo igual que antes
+  const minutosTotales = this.getMinutosEntre(ini, fin);
 
-      const minutosTotales = this.getMinutosEntre(ini, fin);
-      if (minutosTotales < duracion) {
-        alert(`⛔ La duración del turno es mayor que el rango disponible en ${dia} - ${esp.nombre}`);
-        return;
-      }
-
-      // Validar que esté dentro del horario público permitido
-      const apertura = this.getMinHora(dia);
-      const cierre = this.getMaxHora(dia);
-      if (ini < apertura || fin > cierre) {
-        alert(`⛔ El horario debe estar entre ${apertura} y ${cierre} en ${dia}`);
-        return;
-      }
-
-      // Validar superposición de horarios
-      for (const r of rangos) {
-        if (
-          (ini >= r.inicio && ini < r.fin) ||
-          (fin > r.inicio && fin <= r.fin) ||
-          (ini <= r.inicio && fin >= r.fin)
-        ) {
-          alert(`❌ Conflicto entre horarios de especialidades el ${dia}`);
-          return;
-        }
-      }
-
-      rangos.push({ inicio: ini, fin: fin });
-
-      payload.push({
-        especialista_id: especialistaId,
-        especialidad_id: esp.id,
-        dia_semana: dia,
-        hora_inicio: ini,
-        hora_fin: fin,
-        duracion_turno: duracion,
-        activo: true,
-      });
+  // Validar superposición de horarios
+  for (const r of rangos) {
+    if (
+      (ini >= r.inicio && ini < r.fin) ||
+      (fin > r.inicio && fin <= r.fin) ||
+      (ini <= r.inicio && fin >= r.fin)
+    ) {
+      alert(`❌ Conflicto entre horarios de especialidades el ${dia}`);
+      return;
     }
+  }
+
+  rangos.push({ inicio: ini, fin: fin });
+
+  payload.push({
+    especialista_id: especialistaId,
+    especialidad_id: esp.id,
+    dia_semana: dia,
+    hora_inicio: ini,
+    hora_fin: fin,
+    duracion_turno: duracion,
+    activo: true,
+  });
+}
+
   }
 
   // Limpiar horarios anteriores
@@ -215,12 +202,29 @@ getMaxHora(dia: string): string {
 }
 
 
-validarHorario(dia: string, inicio: string, fin: string, duracion: number): string | null {
+validarHorario(
+  dia: string,
+  inicio: string,
+  fin: string,
+  duracion: number
+): string | null {
+  // 1. Campos completos
   if (!inicio || !fin) return 'Debés completar ambos horarios.';
 
+  // 2. Parseo seguro de horas y minutos
   const [hIni, mIni] = inicio.split(':').map(Number);
   const [hFin, mFin] = fin.split(':').map(Number);
 
+  if (
+    isNaN(hIni) || isNaN(mIni) ||
+    isNaN(hFin) || isNaN(mFin) ||
+    hIni < 0 || hIni > 23 || hFin < 0 || hFin > 23 ||
+    mIni < 0 || mIni > 59 || mFin < 0 || mFin > 59
+  ) {
+    return 'El formato de hora es incorrecto.';
+  }
+
+  // 3. Diferencia en minutos
   const minutosInicio = hIni * 60 + mIni;
   const minutosFin = hFin * 60 + mFin;
 
@@ -228,12 +232,19 @@ validarHorario(dia: string, inicio: string, fin: string, duracion: number): stri
     return 'El horario de fin debe ser posterior al de inicio.';
   }
 
+  // 4. Duración total y validación divisibilidad
   const duracionTotal = minutosFin - minutosInicio;
+  if (duracionTotal < duracion) {
+    return `El rango es muy corto para la duración del turno (${duracion} min).`;
+  }
+  if (duracion <= 0) {
+    return 'La duración del turno debe ser mayor a 0.';
+  }
   if (duracionTotal % duracion !== 0) {
     return `La duración total (${duracionTotal} min) no es divisible por la duración del turno (${duracion} min).`;
   }
 
-  // Validar horario dentro de la atención al público
+  // 5. Validar horario dentro de atención al público
   const apertura = 8 * 60; // 08:00
   const cierre = dia === 'Sábado' ? 14 * 60 : 19 * 60; // 14:00 o 19:00
 
@@ -241,8 +252,10 @@ validarHorario(dia: string, inicio: string, fin: string, duracion: number): stri
     return `El horario debe estar dentro del horario de atención (${this.formatTime(apertura)} - ${this.formatTime(cierre)}).`;
   }
 
+  // 6. OK
   return null;
 }
+
 
 formatTime(min: number): string {
   const h = Math.floor(min / 60).toString().padStart(2, '0');

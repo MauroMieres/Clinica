@@ -191,8 +191,8 @@ async cargarTurnosEspecialista() {
  async cargarEspecialistasPorEspecialidad() {
   const { data } = await this.supabaseService.client
     .from('especialista_especialidad')
-    .select('especialista_id') // ✅ campo correcto
-    .eq('especialidad_id', this.especialidadSeleccionada); // ✅ campo correcto
+    .select('especialista_id') 
+    .eq('especialidad_id', this.especialidadSeleccionada);
 
   const ids = data?.map(e => e.especialista_id) || [];
   this.especialistasFiltrados = this.especialistas.filter(e => ids.includes(e.id));
@@ -201,8 +201,8 @@ async cargarTurnosEspecialista() {
  async cargarEspecialidadesPorEspecialista() {
   const { data } = await this.supabaseService.client
     .from('especialista_especialidad')
-    .select('especialidad_id') // ✅ campo correcto
-    .eq('especialista_id', this.especialistaSeleccionado); // ✅ campo correcto
+    .select('especialidad_id') 
+    .eq('especialista_id', this.especialistaSeleccionado); 
 
   const ids = data?.map(e => e.especialidad_id) || [];
   this.especialidadesFiltradas = this.especialidades.filter(e => ids.includes(e.id));
@@ -223,7 +223,7 @@ async cargarTurnosEspecialista() {
     .select('fecha_inicio')
     .eq('id_especialista', this.especialistaSeleccionado)
     .eq('id_especialidad', this.especialidadSeleccionada)
-    .in('estado', ['solicitado', 'aceptado', 'finalizado']); // filtrá los ocupados en todos estos estados
+    .in('estado', ['solicitado', 'aceptado', 'finalizado']); 
 
   // Lista de fechas ocupadas en formato "YYYY-MM-DD HH:mm:00"
   const ocupados = (turnosOcupadosRaw || []).map(t => {
@@ -270,7 +270,7 @@ async cargarTurnosEspecialista() {
           String(turnoFin.getHours()).padStart(2, '0') + ':' +
           String(turnoFin.getMinutes()).padStart(2, '0') + ':00';
 
-        // 💡 Solo agregar si NO está ocupado
+     
         if (!ocupados.includes(isoInicio) && turnoFin <= fin) {
           posiblesTurnos.push({
             fecha_inicio: isoInicio,
@@ -299,7 +299,7 @@ async cargarTurnosEspecialista() {
     return;
   }
 
-  // Si es admin, debe seleccionar paciente
+  
   let pacienteId = this.userId;
   if (this.userRole === 'admin') {
     if (!this.pacienteSeleccionadoPorAdmin) {
@@ -309,7 +309,7 @@ async cargarTurnosEspecialista() {
     pacienteId = this.pacienteSeleccionadoPorAdmin;
   }
 
-  // Validar que no haya doble turno reservado (como antes)
+ 
   const { data: turnosExistentes } = await this.supabaseService.client
     .from('turnos')
     .select('id')
@@ -357,7 +357,7 @@ async cargarTurnosEspecialista() {
     this.especialistaSeleccionado = null;
     this.horarioSeleccionado = null;
     this.horariosDisponibles = [];
-    this.modoBusqueda = 'especialidad'; // Opcional
+    this.modoBusqueda = 'especialidad'; 
     this.modoSolicitud = false;
     if (this.userRole === 'paciente') {
       await this.cargarTurnosPaciente();
@@ -367,7 +367,7 @@ async cargarTurnosEspecialista() {
 
 
 async cargarEspecialidadesParaFiltro() {
-  // Extraer especialidades únicas de los turnos cargados
+
   const unique = new Map();
   this.turnos.forEach(t => {
     if (t.especialidades) {

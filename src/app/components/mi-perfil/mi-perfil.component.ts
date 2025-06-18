@@ -35,6 +35,10 @@ export class MiPerfilComponent implements OnInit {
       case 'especialista':
         table = 'especialistas';
         break;
+          case 'admin':
+  case 'administrador':
+    table = 'administradores';
+    break;
     }
 
     try {

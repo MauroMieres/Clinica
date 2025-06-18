@@ -39,9 +39,15 @@ export class AppComponent implements OnInit{
   logout() {
   this.supabaseService.client.auth.signOut().then(() => {
     this.isLoggedIn = false;
-    this.router.navigate(['/login']);
-    
+    // Borra localStorage para usuario y rol
+    localStorage.removeItem('user');
+    localStorage.removeItem('userRole');
+    // Redirigí al login y forzá reload
+    this.router.navigate(['/login']).then(() => {
+      window.location.reload(); // 👈 fuerza el refresh de todo el estado
+    });
   });
 }
+
 
 }

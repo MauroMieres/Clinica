@@ -18,6 +18,13 @@
         </ng-container>
       </div>
 
+      <ng-container *ngIf="userRole === 'admin' || userRole === 'administrador'">
+  <div class="mb-3">
+    <img *ngIf="user.foto_url" [src]="user.foto_url" class="img-thumbnail" width="200" alt="Foto de perfil admin">
+  </div>
+</ng-container>
+
+
    <div class="col-md-6 text-center">
   <!-- Paciente: dos fotos lado a lado -->
   <ng-container *ngIf="userRole === 'paciente'">
