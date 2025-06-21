@@ -1,4 +1,7 @@
-<div class="full-background d-flex align-items-center justify-content-start min-vh-100 position-relative">
+<div
+  class="full-background d-flex align-items-center justify-content-start min-vh-100 position-relative"
+  [class.fade-out]="isFadingOut"
+>
   <div class="welcome-box p-4 shadow">
     <div class="container mt-4">
       <!-- Título + Botón en la misma fila -->
@@ -8,9 +11,15 @@
     <button class="btn btn-success me-2" [routerLink]="['/register']" [queryParams]="{ admin: true }">
       + Crear Usuario
     </button>
-    <button class="btn btn-secondary" routerLink="/home">
-      ← Volver al Home
-    </button>
+
+    <button class="btn btn-outline-primary me-2" (click)="exportarUsuariosAExcel()">
+  Descargar Excel de Usuarios
+</button>
+
+    <button class="btn btn-secondary" (click)="volverAlHome()" [disabled]="isFadingOut">
+  ← Volver al Home
+</button>
+
   </div>
 </div>
 

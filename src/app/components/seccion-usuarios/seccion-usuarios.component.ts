@@ -3,6 +3,10 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SupabaseService } from '../../../services/supabase.service';
 import { FormsModule } from '@angular/forms';
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
+
+
 
 @Component({
   selector: 'app-seccion-usuarios',
@@ -15,6 +19,7 @@ export class SeccionUsuariosComponent implements OnInit {
   pacientes: any[] = [];
   especialistas: any[] = [];
   administradores: any[] = [];
+  isFadingOut = false;
 
   constructor(private supabase: SupabaseService, private router: Router) {}
 
@@ -39,5 +44,32 @@ export class SeccionUsuariosComponent implements OnInit {
     state: { usuario, tipo }
   });
 }
+
+ exportarUsuariosAExcel() {
+    // Unifica los arrays agregando una columna tipo
+    const datos = [
+      ...this.pacientes.map(u => ({ ...u, tipo: 'Paciente' })),
+      ...this.especialistas.map(u => ({ ...u, tipo: 'Especialista' })),
+      ...this.administradores.map(u => ({ ...u, tipo: 'Administrador' }))
+    ];
+
+    // Remueve columnas no deseadas, si querés (opcional)
+    // const datosLimpios = datos.map(({ password, ...rest }) => rest);
+
+    // Crea el sheet y el archivo
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datos);
+    const wb: XLSX.WorkBook = { Sheets: { 'Usuarios': ws }, SheetNames: ['Usuarios'] };
+    const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    FileSaver.saveAs(new Blob([buffer], { type: 'application/octet-stream' }),
+      `usuarios_${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
+  }
+
+   volverAlHome() {
+    this.isFadingOut = true;
+    setTimeout(() => {
+      this.router.navigate(['/home']);
+    }, 500); // Tiempo igual al CSS (0.5s)
+  }
 
 }

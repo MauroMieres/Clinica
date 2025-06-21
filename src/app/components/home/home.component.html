@@ -1,14 +1,15 @@
-<div class="full-background d-flex align-items-center justify-content-start min-vh-100 position-relative">
+<div
+  class="full-background d-flex align-items-center justify-content-start min-vh-100 position-relative"
+  [class.fade-out]="isFadingOut"
+>
   <div class="welcome-box p-4 shadow">
     <h1 class="mb-4">Bienvenido</h1>
     <button
       *ngIf="userRole === 'admin'"
       class="btn btn-primary"
-      routerLink="/usuarios"
+      (click)="irAUsuarios()"
     >
       Ir a sección de usuarios
     </button>
   </div>
 </div>
-
-

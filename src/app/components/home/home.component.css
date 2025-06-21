@@ -3,6 +3,8 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  transition: opacity 0.5s ease;
+  opacity: 1;
 }
 
 .welcome-box {
@@ -10,4 +12,8 @@
   border-radius: 10px;
   margin-left: 5%; 
   max-width: 400px;
+}
+
+.full-background.fade-out {
+  opacity: 0;
 }
