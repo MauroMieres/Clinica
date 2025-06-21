@@ -30,13 +30,6 @@
   z-index: 2 !important;
 }
 
-.btn-floating {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  font-size: 24px;
-}
-
 .acceso-box {
   max-width: 400px;
 }

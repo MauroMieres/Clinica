@@ -129,9 +129,34 @@ export class LoginComponent {
     { email: 'mnmtwittermnm@gmail.com', password: 'cacatua' , tipo: 'Administrador' },
   ];
 
-  loginRapido(usuario: { email: string, password: string }) {
-    this.username = usuario.email;
-    this.password = usuario.password;
-    setTimeout(() => this.login(), 100); 
-  }
+botonAnimado: string | null = null;
+
+loginRapido(usuario: { email: string, password: string }) {
+  this.botonAnimado = usuario.email;
+
+  setTimeout(() => {
+    this.botonAnimado = null;
+  }, 900);
+
+  // PRIMERO asignás los datos, LUEGO ejecutás login
+  this.username = usuario.email;
+  this.password = usuario.password;
+  setTimeout(() => this.login(), 100);
+}
+
+  
+animandoRayo = false;
+
+abrirAccesosRapidos() {
+  // Evitá doble click mientras anima
+  if (this.animandoRayo) return;
+  this.animandoRayo = true;
+
+  setTimeout(() => {
+    this.animandoRayo = false;
+    this.mostrarAccesos = !this.mostrarAccesos;
+  }, 650); // Coincide con la duración de la animación (0.65s)
+}
+
+
 }

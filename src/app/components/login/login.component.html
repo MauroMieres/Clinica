@@ -14,7 +14,6 @@
           <h2 class="text-center mb-4">Iniciar Sesión</h2>
 
           <form #loginForm="ngForm" (ngSubmit)="login()" novalidate>
-
             <div class="mb-3">
               <label for="username" class="form-label">Email</label>
               <input
@@ -81,20 +80,25 @@
 </div>
 
 <div class="position-fixed bottom-0 start-0 m-3 z-3">
-  <button class="btn btn-secondary rounded-circle p-3" (click)="mostrarAccesos = !mostrarAccesos">
+  <button 
+    class="btn btn-secondary rounded-circle p-3"
+    [ngClass]="{'animate__animated animate__rotateIn': animandoRayo}"
+    (click)="abrirAccesosRapidos()"
+    [disabled]="animandoRayo"
+  >
     ⚡
   </button>
 
- <div *ngIf="mostrarAccesos" class="mt-2 bg-white rounded shadow p-2 acceso-box">
+  <div *ngIf="mostrarAccesos" class="mt-2 bg-white rounded shadow p-2 acceso-box">
     <p class="mb-2 fw-bold">Acceso rápido:</p>
-   <button
-  *ngFor="let usuario of accesosRapidos"
-  class="btn btn-outline-primary btn-sm w-100 mb-1 text-start d-flex justify-content-between align-items-center acceso-opcion"
-  (click)="loginRapido(usuario)"
->
-  <span>{{ usuario.email }}</span>
-  <span class="badge text-bg-secondary">{{ usuario.tipo }}</span>
-</button>
-
+    <button
+      *ngFor="let usuario of accesosRapidos"
+      class="btn btn-outline-primary btn-sm w-100 mb-1 text-start d-flex justify-content-between align-items-center acceso-opcion"
+      [ngClass]="{'animate__animated animate__pulse': botonAnimado === usuario.email}"
+      (click)="loginRapido(usuario)"
+    >
+      <span>{{ usuario.email }}</span>
+      <span class="badge text-bg-secondary">{{ usuario.tipo }}</span>
+    </button>
   </div>
 </div>

@@ -41,7 +41,7 @@
         <td>{{ turno.fecha_inicio | date:'dd/MM HH:mm' }} a {{ turno.fecha_fin | date:'HH:mm' }}hs</td>
         <td>{{ turno.especialistas?.nombre }} {{ turno.especialistas?.apellido }}</td>
         <td>{{ turno.especialidades?.nombre }}</td>
-        <td>{{ turno.id_paciente }}</td>
+        <td>{{ turno.pacientes?.nombre }} {{ turno.pacientes?.apellido }}</td>
         <td>{{ turno.estado }}</td>
         <td>
   <button
