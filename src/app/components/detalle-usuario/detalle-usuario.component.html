@@ -20,6 +20,16 @@
       <p><strong>Obra Social:</strong> {{ usuario.obra_social }}</p>
     </div>
 
+    <div *ngIf="tipo === 'paciente'" class="mb-3">
+  <button class="btn btn-primary" (click)="toggleHistoriaClinica()">
+    {{ verHistoriaClinica ? 'Ocultar' : 'Ver' }} Historia Clínica
+  </button>
+</div>
+<div *ngIf="verHistoriaClinica">
+  <app-historia-clinica [pacienteId]="usuario.id"></app-historia-clinica>
+</div>
+
+
     <div *ngIf="tipo === 'especialista'">
      <p><strong>Especialidades:</strong>
   <span *ngIf="especialidades.length > 0; else sinEspecialidades">

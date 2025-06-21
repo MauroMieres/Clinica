@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SupabaseService } from '../../../services/supabase.service';
 import { FormsModule } from '@angular/forms';
+import { HistoriaClinicaComponent } from '../historia-clinica/historia-clinica.component';
+
 
 @Component({
   selector: 'app-detalle-usuario',
   standalone: true,
   templateUrl: './detalle-usuario.component.html',
   styleUrl: './detalle-usuario.component.css',
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule,HistoriaClinicaComponent]
 })
 export class DetalleUsuarioComponent implements OnInit {
   usuario: any;
@@ -19,6 +21,11 @@ export class DetalleUsuarioComponent implements OnInit {
   mostrarConfirmacion: boolean = false;
   especialidades: string[] = [];
 
+  verHistoriaClinica = false;
+
+toggleHistoriaClinica() {
+  this.verHistoriaClinica = !this.verHistoriaClinica;
+}
 
   constructor(private router: Router, private supabase: SupabaseService) {
     const navigation = this.router.getCurrentNavigation();

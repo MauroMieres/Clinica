@@ -1,0 +1,25 @@
+<!-- historia-clinica.component.html -->
+
+<div *ngIf="loading" class="historia-clinica-box text-center text-muted">
+  Cargando historia clínica...
+</div>
+<div *ngIf="!loading && atenciones.length === 0" class="historia-clinica-box text-center text-muted">
+  <i>No hay historia clínica registrada.</i>
+</div>
+<div *ngIf="!loading && atenciones.length > 0" class="historia-clinica-box">
+  <h4 class="mb-3">Historia Clínica</h4>
+  <div *ngFor="let at of atenciones; let i = index" class="mb-4 pb-3 border-bottom">
+    <b>Atención {{ atenciones.length - i }}:</b> {{ at.fecha_atencion | date:'dd/MM/yyyy HH:mm' }}<br>
+    <b>Especialista:</b> {{ at.especialistas?.[0]?.nombre }} {{ at.especialistas?.[0]?.apellido }}<br>
+    <b>Altura:</b> {{ at.altura }} cm &nbsp; <b>Peso:</b> {{ at.peso }} kg <br>
+    <b>Temperatura:</b> {{ at.temperatura }} °C &nbsp; <b>Presión:</b> {{ at.presion }}<br>
+    <ng-container *ngIf="at.dinamicos && at.dinamicos.length > 0">
+      <b>Otros datos:</b>
+      <ul>
+        <li *ngFor="let d of at.dinamicos">
+          <b>{{ d.clave }}:</b> {{ d.valor }}
+        </li>
+      </ul>
+    </ng-container>
+  </div>
+</div>

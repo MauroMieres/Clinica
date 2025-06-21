@@ -1,0 +1,19 @@
+<div class="container py-4">
+  <h2>Pacientes Atendidos</h2>
+  <div *ngIf="pacientes.length === 0" class="text-muted mt-4">No hay pacientes atendidos aún.</div>
+
+  <div *ngFor="let paciente of pacientes" class="card mb-3 p-3">
+    <b>{{ paciente.nombre }} {{ paciente.apellido }}</b>
+    <div>DNI: {{ paciente.dni }} - Email: {{ paciente.email }}</div>
+
+    <!-- Botón para ver historia clínica -->
+    <button class="btn btn-primary btn-sm mt-2" (click)="toggleHistoriaClinica(paciente.id)">
+      Ver Historia Clínica
+    </button>
+
+    <!-- Historia Clínica visible solo si el ID coincide -->
+    <div *ngIf="verHistoriaClinica && pacienteSeleccionadoId === paciente.id" class="mt-3">
+      <app-historia-clinica [pacienteId]="paciente.id"></app-historia-clinica>
+    </div>
+  </div>
+</div>

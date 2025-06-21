@@ -1,0 +1,19 @@
+.historia-clinica-box {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px 0 #0001;
+  padding: 24px 30px;
+  border: 1px solid #e2e2e2;
+  margin-bottom: 30px;
+}
+
+.historia-clinica-box ul {
+  padding-left: 20px;   /* O bajalo más si querés */
+  margin-bottom: 0;
+}
+
+.historia-clinica-box ul li {
+  margin-left: 0;
+  padding-left: 0;
+  list-style-position: inside; /* <- ¡Esto hace que la clave quede pegada al punto! */
+}

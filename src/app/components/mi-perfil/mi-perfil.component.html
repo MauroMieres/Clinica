@@ -26,13 +26,22 @@
 
 
    <div class="col-md-6 text-center">
-  <!-- Paciente: dos fotos lado a lado -->
-  <ng-container *ngIf="userRole === 'paciente'">
-    <div class="d-flex justify-content-center gap-3 mb-3">
-      <img *ngIf="user.foto1_url" [src]="user.foto1_url" class="img-thumbnail" width="200" alt="Foto 1">
-      <img *ngIf="user.foto2_url" [src]="user.foto2_url" class="img-thumbnail" width="200" alt="Foto 2">
-    </div>
-  </ng-container>
+ 
+<ng-container *ngIf="userRole === 'paciente'">
+  <div class="d-flex justify-content-center gap-3 mb-3">
+    <img *ngIf="user.foto1_url" [src]="user.foto1_url" class="img-thumbnail" width="200" alt="Foto 1">
+    <img *ngIf="user.foto2_url" [src]="user.foto2_url" class="img-thumbnail" width="200" alt="Foto 2">
+  </div>
+  <div class="text-center mb-3">
+    <button class="btn btn-primary" (click)="verHistoriaClinica()">
+      {{ verHistoria ? 'Ocultar' : 'Ver' }} Historia Clínica
+    </button>
+  </div>
+  <app-historia-clinica
+    *ngIf="verHistoria"
+    [pacienteId]="user.id">
+  </app-historia-clinica>
+</ng-container>
 
   <!-- Especialista: una foto -->
   <ng-container *ngIf="userRole === 'especialista' && user.foto_url">

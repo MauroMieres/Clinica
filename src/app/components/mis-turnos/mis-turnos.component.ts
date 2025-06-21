@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 
+
 @Component({
   selector: 'app-mis-turnos',
   standalone: true,
@@ -20,6 +21,17 @@ export class MisTurnosComponent implements OnInit {
 filtroEspecialidadTexto: string = '';
 filtroNombreEspecialista: string = '';
 
+ pacientesConHistoria = new Set<string>();
+  pacienteSeleccionadoId: string | null = null;
+
+  pacienteTieneHistoria(id: any): boolean {
+    return this.pacientesConHistoria.has(String(id));
+  }
+
+  toggleHistoriaClinica(pacienteId: any) {
+    this.pacienteSeleccionadoId =
+      this.pacienteSeleccionadoId === pacienteId ? null : pacienteId;
+  }
 
 
   modoSolicitud = false;
@@ -500,51 +512,136 @@ async marcarComoFinalizado(turno: any) {
     return;
   }
 
-  // Pedir la reseña
-  const { value: resena } = await Swal.fire({
-    title: 'Reseña del turno',
-    input: 'textarea',
-    inputLabel: 'Describa la atención, diagnóstico, indicaciones, etc.',
-    inputPlaceholder: 'Escriba aquí la reseña médica...',
-    inputAttributes: {
-      'aria-label': 'Escriba aquí la reseña'
+  // Abrir el formulario de historia clínica
+  const { value: formValues } = await Swal.fire({
+    title: 'Historia Clínica',
+     width: 1100,
+   html: `
+ <div style="display: flex; gap: 12px;">
+  <div style="flex:1;">
+    <label>Altura (cm):</label>
+    <input id="altura" type="number" min="20" max="300" class="swal2-input" placeholder="Ej: 170">
+  </div>
+  <div style="flex:1;">
+    <label>Peso (kg):</label>
+    <input id="peso" type="number" min="1" max="500" class="swal2-input" placeholder="Ej: 70">
+  </div>
+  <div style="flex:1;">
+    <label>Temperatura (°C):</label>
+    <input id="temperatura" type="number" min="30" max="45" step="0.1" class="swal2-input" placeholder="Ej: 36.6">
+  </div>
+  <div style="flex:1;">
+    <label>Presión (ej: 120/80):</label>
+    <input id="presion" class="swal2-input" placeholder="Ej: 120/80">
+  </div>
+</div>
+
+  <hr>
+  <div>
+    <label>Dato dinámico 1:</label>
+    <div style="display:flex; gap:12px;">
+      <input id="clave1" class="swal2-input" placeholder="Clave" style="flex:1;">
+      <input id="valor1" class="swal2-input" placeholder="Valor" style="flex:1;">
+    </div>
+  </div>
+  <div>
+    <label>Dato dinámico 2:</label>
+    <div style="display:flex; gap:12px;">
+      <input id="clave2" class="swal2-input" placeholder="Clave" style="flex:1;">
+      <input id="valor2" class="swal2-input" placeholder="Valor" style="flex:1;">
+    </div>
+  </div>
+  <div>
+    <label>Dato dinámico 3:</label>
+    <div style="display:flex; gap:12px;">
+      <input id="clave3" class="swal2-input" placeholder="Clave" style="flex:1;">
+      <input id="valor3" class="swal2-input" placeholder="Valor" style="flex:1;">
+    </div>
+  </div>
+`
+,
+    focusConfirm: false,
+    preConfirm: () => {
+      const altura = (document.getElementById('altura') as HTMLInputElement).value;
+      const peso = (document.getElementById('peso') as HTMLInputElement).value;
+      const temperatura = (document.getElementById('temperatura') as HTMLInputElement).value;
+      const presion = (document.getElementById('presion') as HTMLInputElement).value;
+
+      // Validación básica
+      if (!altura || !peso || !temperatura || !presion) {
+        Swal.showValidationMessage('Completá todos los datos fijos');
+        return false;
+      }
+
+      // Datos dinámicos
+      const dinamicos: { clave: string, valor: string }[] = [];
+      for (let i = 1; i <= 3; i++) {
+        const clave = (document.getElementById('clave' + i) as HTMLInputElement).value;
+        const valor = (document.getElementById('valor' + i) as HTMLInputElement).value;
+        if ((clave && !valor) || (!clave && valor)) {
+          Swal.showValidationMessage('Completá tanto clave como valor para cada dato dinámico');
+          return false;
+        }
+        if (clave && valor) {
+          dinamicos.push({ clave, valor });
+        }
+      }
+
+      return { altura, peso, temperatura, presion, dinamicos };
     },
     showCancelButton: true,
-    confirmButtonText: 'Finalizar turno',
-    cancelButtonText: 'Volver'
+    confirmButtonText: 'Guardar historia clínica',
+    cancelButtonText: 'Cancelar'
   });
 
-  if (!resena || !resena.trim()) {
-    await Swal.fire({
-      icon: 'warning',
-      title: 'Debe ingresar una reseña para finalizar el turno.',
-      confirmButtonText: 'Ok'
-    });
-    return;
-  }
+  if (formValues) {
+    // 1. Guardar la historia clínica fija
+    const { error: errorHC, data: historiaClinicaData } = await this.supabaseService.client
+      .from('historia_clinica')
+      .insert([{
+        paciente_id: turno.id_paciente,
+        especialista_id: turno.id_especialista,
+        fecha_atencion: turno.fecha_fin, // O usar new Date() si preferís el momento real
+        altura: formValues.altura,
+        peso: formValues.peso,
+        temperatura: formValues.temperatura,
+        presion: formValues.presion
+      }])
+      .select()
+      .single();
 
-  // Guardar la reseña junto con el cambio de estado
-  const { error } = await this.supabaseService.client
-    .from('turnos')
-    .update({ estado: 'finalizado', resena: resena })
-    .eq('id', turno.id);
+    if (errorHC || !historiaClinicaData) {
+      await Swal.fire('Error', 'No se pudo guardar la historia clínica.', 'error');
+      return;
+    }
 
-  if (error) {
-    await Swal.fire({
-      icon: 'error',
-      title: 'No se pudo finalizar el turno.',
-      confirmButtonText: 'Ok'
-    });
-    console.error(error);
-  } else {
-    await Swal.fire({
-      icon: 'success',
-      title: 'Turno finalizado correctamente.',
-      confirmButtonText: 'Ok'
-    });
+    // 2. Guardar los datos dinámicos
+    for (const dinamico of formValues.dinamicos) {
+      await this.supabaseService.client
+        .from('historia_clinica_dinamicos')
+        .insert([{
+          historia_clinica_id: historiaClinicaData.id,
+          clave: dinamico.clave,
+          valor: dinamico.valor
+        }]);
+    }
+
+    // 3. Marcar el turno como finalizado
+    const { error: errorTurno } = await this.supabaseService.client
+      .from('turnos')
+      .update({ estado: 'finalizado' })
+      .eq('id', turno.id);
+
+    if (errorTurno) {
+      await Swal.fire('Error', 'No se pudo finalizar el turno.', 'error');
+      return;
+    }
+
+    await Swal.fire('Éxito', 'Historia clínica guardada y turno finalizado.', 'success');
     this.cargarTurnosEspecialista();
   }
 }
+
 
 
 

@@ -38,5 +38,9 @@ export const routes: Routes = [
     path: 'solicitar-turnos',
     loadComponent: () => import('./components/solicitar-turnos/solicitar-turnos.component').then(m => m.SolicitarTurnosComponent),
   },
+  {
+    path: 'pacientes',
+    loadComponent: () => import('./components/pacientes/pacientes.component').then(m => m.PacientesComponent),
+  },
   { path: '**', redirectTo: '/login' },
 ];

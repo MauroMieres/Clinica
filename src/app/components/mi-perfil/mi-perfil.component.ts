@@ -3,12 +3,13 @@ import { SupabaseService } from '../../../services/supabase.service';
 import { CommonModule } from '@angular/common';
 import { NgIf } from '@angular/common';
 import { MiPerfilHorariosComponent } from '../especialista/mi-perfil-horarios.component';
-
+import Swal from 'sweetalert2';
+import { HistoriaClinicaComponent } from '../historia-clinica/historia-clinica.component';
 
 @Component({
   selector: 'app-mi-perfil',
   standalone: true,
-  imports: [CommonModule, NgIf,MiPerfilHorariosComponent],
+  imports: [CommonModule, NgIf,MiPerfilHorariosComponent,HistoriaClinicaComponent],
   templateUrl: './mi-perfil.component.html',
   styleUrls: ['./mi-perfil.component.css']
 })
@@ -16,6 +17,8 @@ export class MiPerfilComponent implements OnInit {
   user: any = null;
   userRole: string = '';
   especialidadesDelEspecialista: string[] = [];
+  verHistoria = false;
+
 
   constructor(private supabaseService: SupabaseService) {}
 
@@ -75,4 +78,9 @@ export class MiPerfilComponent implements OnInit {
       console.error('❌ Excepción al cargar perfil:', e);
     }
   }
+
+ verHistoriaClinica() {
+  this.verHistoria = !this.verHistoria;
+}
+
 }
