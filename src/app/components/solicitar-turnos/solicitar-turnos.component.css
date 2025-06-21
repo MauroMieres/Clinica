@@ -3,9 +3,126 @@
   border-radius: 16px;
   box-shadow: 0 4px 24px 0 #0002;
   padding: 32px 32px 24px 32px;
-  min-width: 370px;  /* Más ancho (ajustá el valor a gusto) */
+  min-width: 370px;
   max-width: 430px;
   width: 100%;
   margin: 0 auto;
   transition: box-shadow 0.2s;
+}
+
+/* Especialista (profesional) */
+.especialista-item {
+  display: inline-block;
+  cursor: pointer;
+  padding: 6px 4px 2px 4px;
+  border-radius: 16px;
+  transition: box-shadow 0.2s, border 0.2s;
+  border: 2px solid transparent;
+}
+.especialista-item.selected {
+  border: 2px solid #007bff;
+  box-shadow: 0 0 8px #007bff55;
+  background: #f4faff;
+}
+.boton-profesional-img {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #bbb;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.especialista-item.selected .boton-profesional-img {
+  border: 2px solid #007bff;
+  box-shadow: 0 0 8px #007bff55;
+}
+
+/* Especialidad */
+.boton-especialidad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: none;
+  background: #f7f7f7;
+  border-radius: 1rem;
+  padding: 10px 12px;
+  cursor: pointer;
+  min-width: 100px;
+  min-height: 120px;
+  box-shadow: 0 2px 8px #ccc3;
+  transition: box-shadow 0.2s, border 0.2s;
+  margin: 2px;
+  border: 2px solid transparent;
+}
+.boton-especialidad.selected,
+.boton-especialidad:active {
+  border: 2px solid #007bff;
+  box-shadow: 0 0 8px #007bff55;
+  background: #f4faff;
+}
+.boton-especialidad-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 4px;
+  background: #eee;
+}
+
+/* Día disponible */
+.boton-dia {
+  border-radius: 8px;
+  background: #f1f1f1;
+  border: 1px solid #bbb;
+  padding: 8px 16px;
+  margin: 2px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.boton-dia.selected {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* Horario */
+.boton-hora {
+  border-radius: 12px;
+  background: #f9f9f9;
+  border: 1px solid #bbb;
+  padding: 10px 16px;
+  margin: 2px;
+  cursor: pointer;
+  font-weight: bold;
+  min-width: 60px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.boton-hora.selected {
+  background: #28a745;
+  color: white;
+  border-color: #28a745;
+}
+
+/* Nombres destacados */
+.nombre-esp {
+  font-weight: 500;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+/* Alertas */
+.alert {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+.alert-info {
+  background: #e5f7ff;
+  color: #007bff;
+}
+.alert-warning {
+  background: #fffbe5;
+  color: #b38a00;
 }

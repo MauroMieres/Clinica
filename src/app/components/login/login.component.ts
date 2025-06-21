@@ -124,7 +124,7 @@ export class LoginComponent {
     { email: 'jejefo5321@lewou.com', password: 'cacatua' , tipo: 'Paciente' },
     { email: 'tisek95069@hosliy.com', password: 'cacatua' , tipo: 'Paciente' },
     { email: 'mauronicolasmieres@gmail.com', password: 'cacatua', tipo: 'Paciente' },
-    { email: 'sopiye2457@jio1.com', password: 'cacatua' , tipo: 'Especialista' },
+    { email: 'dajer50942@nab4.com', password: 'cacatua' , tipo: 'Especialista' },
     { email: 'fiferow558@nab4.com', password: 'cacatua' , tipo: 'Especialista' },
     { email: 'mnmtwittermnm@gmail.com', password: 'cacatua' , tipo: 'Administrador' },
   ];
