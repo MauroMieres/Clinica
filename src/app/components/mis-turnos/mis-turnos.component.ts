@@ -87,7 +87,87 @@ async cargarTurnosEspecialista() {
     this.turnos = data || [];
     await this.cargarEspecialidadesParaFiltro();
     this.filtrarTurnosPorEspecialidad(); // aplicar filtro al inicio
+
+    await this.cargarHistoriasClinicasParaTurnos(this.turnos);
+this.turnosFiltrados = [...this.turnos]; // refrescá la copia filtrada
+
   }
+}
+
+filtroGeneral: string = '';
+
+filtrarTurnosGeneral() {
+  const filtro = this.filtroGeneral.trim().toLowerCase();
+
+  if (!filtro) {
+    this.turnosFiltrados = [...this.turnos];
+    return;
+  }
+
+  this.turnosFiltrados = this.turnos.filter(turno => {
+    // Armá un string grande con todos los campos que quieras buscar
+    let texto = '';
+
+    // Turno básico
+    texto += (turno.especialidades?.nombre || '') + ' ';
+    texto += (turno.pacientes ? (turno.pacientes?.nombre + ' ' + turno.pacientes?.apellido) : '');
+    texto += (turno.especialistas ? (turno.especialistas?.nombre + ' ' + turno.especialistas?.apellido) : '');
+    texto += (turno.estado || '') + ' ';
+    texto += (turno.fecha_inicio || '') + ' ';
+    texto += (turno.fecha_fin || '') + ' ';
+    texto += (turno.resena || '') + ' ';
+    texto += (turno.comentario || '') + ' ';
+    texto += (turno.nota_cancelacion || '') + ' ';
+
+    // Historia clínica fija (si existe)
+    if (turno.historia_clinica) {
+      texto += (turno.historia_clinica.altura || '') + ' ';
+      texto += (turno.historia_clinica.peso || '') + ' ';
+      texto += (turno.historia_clinica.temperatura || '') + ' ';
+      texto += (turno.historia_clinica.presion || '') + ' ';
+      // Dinámicos
+      if (Array.isArray(turno.historia_clinica.historia_clinica_dinamicos)) {
+        for (const d of turno.historia_clinica.historia_clinica_dinamicos) {
+          texto += (d.clave || '') + ' ' + (d.valor || '') + ' ';
+        }
+      }
+    }
+
+    return texto.toLowerCase().includes(filtro);
+  });
+}
+
+
+verHistoriaClinica(turno: any) {
+  if (!turno.historia_clinica) return;
+
+  let html = `
+    <div>
+      <strong>Altura:</strong> ${turno.historia_clinica.altura || '-'} cm<br>
+      <strong>Peso:</strong> ${turno.historia_clinica.peso || '-'} kg<br>
+      <strong>Temperatura:</strong> ${turno.historia_clinica.temperatura || '-'} °C<br>
+      <strong>Presión:</strong> ${turno.historia_clinica.presion || '-'}<br>
+    </div>
+    <hr>
+  `;
+
+  if (turno.historia_clinica.historia_clinica_dinamicos?.length) {
+    html += `<strong>Datos adicionales:</strong><ul>`;
+    turno.historia_clinica.historia_clinica_dinamicos.forEach((d: any) => {
+      html += `<li><strong>${d.clave}:</strong> ${d.valor}</li>`;
+    });
+    html += `</ul>`;
+  } else {
+    html += `<i>No se cargaron datos adicionales.</i>`;
+  }
+
+  Swal.fire({
+    title: 'Historia Clínica',
+    html: html,
+    width: 600,
+    confirmButtonText: 'Cerrar',
+    customClass: { htmlContainer: 'text-start' }
+  });
 }
 
 
@@ -113,6 +193,9 @@ async cargarTurnosEspecialista() {
     } else {
       this.turnos = data || [];
       this.turnosFiltrados = [...this.turnos];
+      await this.cargarHistoriasClinicasParaTurnos(this.turnos);
+this.turnosFiltrados = [...this.turnos]; // refrescá la copia filtrada
+
 
     }
   }
@@ -787,6 +870,39 @@ async calificarAtencion(turno: any) {
     this.cargarTurnosPaciente(); // refresca la lista
   }
 }
+
+
+async cargarHistoriasClinicasParaTurnos(turnos: any[]) {
+  if (!turnos.length) return;
+
+  // Trae TODAS las historias clínicas para los pacientes involucrados (en el rango de fechas de los turnos)
+  const pacienteIds = [...new Set(turnos.map(t => t.id_paciente))];
+  const especialistaIds = [...new Set(turnos.map(t => t.id_especialista))];
+  
+  const { data: hc, error } = await this.supabaseService.client
+    .from('historia_clinica')
+    .select('*, historia_clinica_dinamicos(*)')
+    .in('paciente_id', pacienteIds)
+    .in('especialista_id', especialistaIds);
+
+  if (error) return;
+
+  for (const turno of turnos) {
+    // Matchea historia clínica por paciente, especialista y fecha
+    turno.historia_clinica = hc.find(h =>
+      h.paciente_id === (turno.id_paciente || turno.pacientes?.id)
+      && h.especialista_id === (turno.id_especialista || turno.especialistas?.id)
+      && this.sonFechasIguales(h.fecha_atencion, turno.fecha_fin)
+    );
+  }
+}
+
+// Función para comparar fechas (ignorando segundos)
+sonFechasIguales(fechaA: string, fechaB: string) {
+  // Puede ser necesario parsear solo hasta minutos
+  return fechaA?.slice(0,16) === fechaB?.slice(0,16);
+}
+
 
 
 
