@@ -756,7 +756,6 @@ abrirResena(turno: any) {
 
 
 async completarEncuesta(turno: any) {
-  // 1. Paso: elige estrellas y escribe texto en un SweetAlert custom
   const { value: formValues } = await Swal.fire({
     title: 'Completar encuesta',
     html: `
@@ -812,7 +811,6 @@ async completarEncuesta(turno: any) {
   });
 
   if (formValues) {
-    // 2. Paso: guardar en Supabase
     const { error } = await this.supabaseService.client
       .from('encuestas')
       .insert([{
@@ -824,7 +822,7 @@ async completarEncuesta(turno: any) {
       await Swal.fire('Error', 'No se pudo guardar la encuesta', 'error');
       return;
     }
-    // 3. (Opcional) marcar en el turno que fue completada la encuesta
+    
     await this.supabaseService.client
       .from('turnos')
       .update({ encuesta_completada: true })
@@ -867,7 +865,7 @@ async calificarAtencion(turno: any) {
     await Swal.fire('Error', 'No se pudo guardar el comentario.', 'error');
   } else {
     await Swal.fire('¡Gracias!', 'Tu comentario fue enviado con éxito.', 'success');
-    this.cargarTurnosPaciente(); // refresca la lista
+    this.cargarTurnosPaciente(); 
   }
 }
 
@@ -897,9 +895,7 @@ async cargarHistoriasClinicasParaTurnos(turnos: any[]) {
   }
 }
 
-// Función para comparar fechas (ignorando segundos)
 sonFechasIguales(fechaA: string, fechaB: string) {
-  // Puede ser necesario parsear solo hasta minutos
   return fechaA?.slice(0,16) === fechaB?.slice(0,16);
 }
 

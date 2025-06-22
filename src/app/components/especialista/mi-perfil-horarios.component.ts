@@ -136,18 +136,17 @@ async guardarHorarios() {
   const h = this.horarios[dia][esp.id];
   if (!h.activo) continue;
 
-  // 🚩 VALIDAR ANTES DE GUARDAR
   const error = this.validarHorario(dia, h.hora_inicio, h.hora_fin, h.duracion_turno);
   if (error) {
     alert(`${dia} - ${esp.nombre}: ${error}`);
-    return; // 🚨 FRENÁ EL GUARDADO
+    return; 
   }
 
   const ini = h.hora_inicio;
   const fin = h.hora_fin;
   const duracion = h.duracion_turno;
 
-  // ...todo igual que antes
+ 
   const minutosTotales = this.getMinutosEntre(ini, fin);
 
   // Validar superposición de horarios
@@ -252,7 +251,6 @@ validarHorario(
     return `El horario debe estar dentro del horario de atención (${this.formatTime(apertura)} - ${this.formatTime(cierre)}).`;
   }
 
-  // 6. OK
   return null;
 }
 
