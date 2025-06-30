@@ -1,0 +1,22 @@
+<div class="fondo-clinica">
+  <div class="logs-container">
+    <h2 class="mb-4 text-center">Logs de Ingresos</h2>
+
+    <div class="mb-3 text-center">
+      <button class="btn btn-success me-2" (click)="exportarExcel()">Exportar a Excel</button>
+      <button class="btn btn-danger" (click)="exportarPDF()">Exportar PDF (Gráfico)</button>
+    </div>
+
+    <div class="chart-wrapper">
+      <canvas #chartCanvas
+  baseChart
+  [data]="barChartData"
+  [options]="barChartOptions"
+  [type]="'bar'">
+</canvas>
+
+<app-turnos-por-especialidad></app-turnos-por-especialidad>
+<app-turnos-por-medico></app-turnos-por-medico>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,9 @@
+.table-bordered > tbody > tr[style] {
+  background-color: inherit !important;
+}
+
+.bg-solicitado { background-color: #fff9c4 !important; }
+.bg-cancelado  { background-color: #ffcdd2 !important; }
+.bg-rechazado  { background-color: #ffcdd2 !important; }
+.bg-finalizado { background-color: #c8e6c9 !important; }
+.bg-aceptado { background-color: #73c7f8 !important; }

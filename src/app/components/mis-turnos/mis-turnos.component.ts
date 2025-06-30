@@ -4,11 +4,24 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 
+import { EstadoColorFilaPipe } from '../../pipes/estado-color-fila.pipe';
+import { EstadoTurnoPipe } from '../../pipes/estado-turno.pipe';
+import { NombreCompletoPipe } from '../../pipes/nombre-completo.pipe';
+import { AutofocusDirective } from '../../directives/autofocus.directive';
+import { BotonHoverDirective } from '../../directives/boton-hover.directive';
+import { MostrarSiDirective } from '../../directives/app-mostrar-si.directive';
+
 
 @Component({
   selector: 'app-mis-turnos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,
+    EstadoColorFilaPipe,
+    EstadoTurnoPipe,
+    NombreCompletoPipe,
+    AutofocusDirective,
+    BotonHoverDirective,
+    MostrarSiDirective],
   templateUrl: './mis-turnos.component.html',
   styleUrls: ['./mis-turnos.component.css']
 })

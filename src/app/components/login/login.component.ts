@@ -56,6 +56,7 @@ export class LoginComponent {
     if (paciente) {
       localStorage.setItem('userRole', 'paciente');
       localStorage.setItem('user', JSON.stringify({ id: paciente.id, rol: 'paciente' }));
+      await this.registrarLogIngreso(userId);
       this.router.navigate(['/home']).then(() => {
     window.location.reload();
   });
@@ -79,6 +80,7 @@ export class LoginComponent {
 
       localStorage.setItem('userRole', 'especialista');
       localStorage.setItem('user', JSON.stringify({ id: especialista.id, rol: 'especialista' }));
+      await this.registrarLogIngreso(userId);
       this.router.navigate(['/home']).then(() => {
     window.location.reload();
   });
@@ -102,6 +104,7 @@ export class LoginComponent {
 
       localStorage.setItem('userRole', 'admin');
      localStorage.setItem('user', JSON.stringify({ id: admin.id, rol: 'admin' }));
+     await this.registrarLogIngreso(userId);
      this.router.navigate(['/home']).then(() => {
     window.location.reload();
   });
@@ -138,7 +141,6 @@ loginRapido(usuario: { email: string, password: string }) {
     this.botonAnimado = null;
   }, 900);
 
-  // PRIMERO asignás los datos, LUEGO ejecutás login
   this.username = usuario.email;
   this.password = usuario.password;
   setTimeout(() => this.login(), 100);
@@ -148,15 +150,20 @@ loginRapido(usuario: { email: string, password: string }) {
 animandoRayo = false;
 
 abrirAccesosRapidos() {
-  // Evitá doble click mientras anima
   if (this.animandoRayo) return;
   this.animandoRayo = true;
 
   setTimeout(() => {
     this.animandoRayo = false;
     this.mostrarAccesos = !this.mostrarAccesos;
-  }, 650); // Coincide con la duración de la animación (0.65s)
+  }, 650); 
 }
 
+private async registrarLogIngreso(userId: string) {
+  await this.supabaseService.client
+    .from('logs_ingresos')
+    .insert([{ user_id: userId }]);
+  // El campo created_at se setea solo por default en supabse
+}
 
 }

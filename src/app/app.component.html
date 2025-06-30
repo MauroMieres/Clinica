@@ -48,6 +48,11 @@
     <a class="nav-link" routerLink="/turnos">Turnos</a>
   </li>
 
+  <!-- TODOS LOS TURNOS: Solo admin -->
+  <li *ngIf="isLoggedIn && userRole === 'admin'" class="nav-item">
+    <a class="nav-link" routerLink="/logs">Estadisticas</a>
+  </li>
+
   <li *ngIf="isLoggedIn" class="nav-item">
     <a class="nav-link" routerLink="/mi-perfil">Mi Perfil</a>
   </li>

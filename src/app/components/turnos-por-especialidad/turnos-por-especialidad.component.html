@@ -1,0 +1,46 @@
+<div class="container py-4" style="max-width: 800px; margin: 0 auto;">
+  <h2 class="mb-4 text-center">Turnos por Especialidad</h2>
+  <div class="mb-3 text-center">
+    <button class="btn btn-success me-2" (click)="exportarExcelTurnos()">Exportar a Excel</button>
+    <button class="btn btn-danger" (click)="exportarPDFTurnos()">Exportar PDF (Gráfico)</button>
+  </div>
+  <div style="background: #fff; padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px #0001;">
+    <canvas
+  #chartCanvas
+  baseChart
+  [data]="barChartData"
+  [options]="barChartOptions"
+  [type]="'bar'"
+  style="display: block; max-width: 700px; margin: 0 auto;"
+></canvas>
+    <ul>
+  <li *ngFor="let esp of especialidadesConCantidad">
+    {{ esp.nombre }}: {{ esp.cantidad }} turnos
+  </li>
+</ul>
+  </div>
+</div>
+
+<div class="container py-4" style="max-width: 800px; margin: 0 auto;">
+  <h2 class="mb-4 text-center">Turnos por Día</h2>
+  <div class="mb-3 text-center">
+    <button class="btn btn-success me-2" (click)="exportarExcelTurnosPorDia()">Exportar a Excel</button>
+    <button class="btn btn-danger" (click)="exportarPDFTurnosPorDia()">Exportar PDF (Gráfico)</button>
+  </div>
+  <div style="background: #fff; padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px #0001;">
+    <canvas
+      #chartCanvasPorDia
+      baseChart
+      [data]="barChartDataPorDia"
+      [options]="barChartOptions"
+      [type]="'bar'"
+      style="display: block; max-width: 700px; margin: 0 auto;">
+    </canvas>
+    <ul>
+      <li *ngFor="let d of turnosPorDia">
+        {{ d.fecha }}: {{ d.cantidad }} turnos
+      </li>
+    </ul>
+  </div>
+</div>
+

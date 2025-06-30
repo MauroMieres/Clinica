@@ -1,0 +1,62 @@
+<div class="container py-4" style="max-width: 900px; margin: 0 auto;">
+  <h2 class="mb-4 text-center">Turnos por Médico</h2>
+  <form class="mb-3 d-flex flex-wrap justify-content-center align-items-center gap-3" (ngSubmit)="aplicarFiltroFechas()">
+    <div>
+      <label>Desde: <input [(ngModel)]="fechaDesde" name="fechaDesde" type="date" class="form-control" /></label>
+    </div>
+    <div>
+      <label>Hasta: <input [(ngModel)]="fechaHasta" name="fechaHasta" type="date" class="form-control" /></label>
+    </div>
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+  </form>
+  <div class="mb-3 text-center">
+    <button class="btn btn-success me-2" (click)="exportarExcelTurnosPorMedico()">Exportar a Excel</button>
+    <button class="btn btn-danger" (click)="exportarPDFTurnosPorMedico()">Exportar PDF (Gráfico + Detalle)</button>
+  </div>
+  <div style="background: #fff; padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px #0001;">
+    <canvas #chartCanvasMedico
+      baseChart
+      [data]="barChartData"
+      [options]="barChartOptions"
+      [type]="'bar'"
+      style="display: block; max-width: 700px; margin: 0 auto;">
+    </canvas>
+    <ul>
+      <li *ngFor="let medico of turnosPorMedico">
+        {{ medico.nombreCompleto }}: {{ medico.cantidad }} turnos
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- NUEVO BLOQUE: Turnos finalizados por médico -->
+<div class="container py-4" style="max-width: 900px; margin: 0 auto;">
+  <h2 class="mb-4 text-center">Turnos FINALIZADOS por Médico</h2>
+  <form class="mb-3 d-flex flex-wrap justify-content-center align-items-center gap-3" (ngSubmit)="aplicarFiltroFechasFinalizados()">
+    <div>
+      <label>Desde: <input [(ngModel)]="fechaDesdeFinalizados" name="fechaDesdeFinalizados" type="date" class="form-control" /></label>
+    </div>
+    <div>
+      <label>Hasta: <input [(ngModel)]="fechaHastaFinalizados" name="fechaHastaFinalizados" type="date" class="form-control" /></label>
+    </div>
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+  </form>
+  <div class="mb-3 text-center">
+    <button class="btn btn-success me-2" (click)="exportarExcelTurnosFinalizadosPorMedico()">Exportar a Excel</button>
+    <button class="btn btn-danger" (click)="exportarPDFTurnosFinalizadosPorMedico()">Exportar PDF (Gráfico + Detalle)</button>
+  </div>
+  <div style="background: #fff; padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px #0001;">
+    <canvas #chartCanvasFinalizados
+      baseChart
+      [data]="barChartFinalizadosData"
+      [options]="barChartFinalizadosOptions"
+      [type]="'bar'"
+      style="display: block; max-width: 700px; margin: 0 auto;">
+    </canvas>
+    <ul>
+      <li *ngFor="let medico of turnosFinalizadosPorMedico">
+        {{ medico.nombreCompleto }}: {{ medico.cantidad }} turnos finalizados
+      </li>
+    </ul>
+  </div>
+</div>
