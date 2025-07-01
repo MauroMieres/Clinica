@@ -1,9 +1,8 @@
 <div class="fondo-clinica">
   <div style="padding: 24px 48px;"></div>
-<!-- 24px arriba/abajo, 48px izquierda/derecha -->
 
 <div *ngFor="let paciente of pacientes" class="dni-card mb-4 p-4 shadow rounded ">
-  <!-- Fotos y datos enumerados en una sola fila -->
+
   <div class="d-flex flex-row align-items-start gap-4">
     <div class="d-flex flex-row gap-2">
       <img [src]="paciente.foto1_url || 'assets/avatar1.svg'" alt="Foto 1" class="foto-dni" />
@@ -17,7 +16,6 @@
     </div>
   </div>
 
-  <!-- Botón para ver los últimos 3 turnos -->
   <div class="mt-3">
     <details>
       <summary class="btn btn-link p-0">Ver últimos 3 turnos</summary>

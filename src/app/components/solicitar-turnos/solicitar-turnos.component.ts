@@ -152,7 +152,6 @@ export class SolicitarTurnosComponent {
     const fechaLimite = new Date(fechaBase);
     fechaLimite.setHours(23, 59, 59, 999);
 
-    // ⚠️ CAMBIO: consulto usando string local (YYYY-MM-DD HH:mm:ss)
     const fechaBaseStr = this.formatFechaLocal(fechaBase);
     const fechaLimiteStr = this.formatFechaLocal(fechaLimite);
 
@@ -200,7 +199,6 @@ export class SolicitarTurnosComponent {
     this.horarioSeleccionado = hora;
   }
 
-  // 👉 Formatea la fecha en string local (YYYY-MM-DD HH:mm:ss)
   formatFechaLocal(fecha: Date): string {
     const año = fecha.getFullYear();
     const mes = String(fecha.getMonth() + 1).padStart(2, '0');

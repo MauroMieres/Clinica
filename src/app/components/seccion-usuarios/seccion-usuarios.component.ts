@@ -45,45 +45,43 @@ export class SeccionUsuariosComponent implements OnInit {
   });
 }
 
- exportarUsuariosAExcel() {
-  const datos = [
-    ...this.pacientes.map(u => ({ ...u, tipo: 'Paciente' })),
-    ...this.especialistas.map(u => ({ ...u, tipo: 'Especialista' })),
-    ...this.administradores.map(u => ({ ...u, tipo: 'Administrador' }))
-  ];
+exportarUsuariosAExcel() {
+    const datos = [
+      ...this.pacientes.map(u => ({ ...u, tipo: 'Paciente' })),
+      ...this.especialistas.map(u => ({ ...u, tipo: 'Especialista' })),
+      ...this.administradores.map(u => ({ ...u, tipo: 'Administrador' }))
+    ];
 
-  // Campos que NO se deben exportar
-  const camposNoDeseados = [
-    'id',
-    'id_auth_user',
-    'foto1_url',
-    'foto2_url',
-    'foto_url'
-  ];
+    const camposNoDeseados = [
+      'id',
+      'id_auth_user',
+      'foto1_url',
+      'foto2_url',
+      'foto_url'
+    ];
 
-  const datosLimpios = datos.map(user => {
-    const nuevoUser: any = {};
-    Object.keys(user).forEach(key => {
-      if (!camposNoDeseados.includes(key)) {
-        // Convierte booleanos a "SI" o "NO"
-        if (typeof user[key] === 'boolean') {
-          nuevoUser[key] = user[key] ? 'SI' : 'NO';
-        } else {
-          nuevoUser[key] = user[key];
+    const datosLimpios = datos.map(user => {
+      const nuevoUser: any = {};
+      Object.keys(user).forEach(key => {
+        if (!camposNoDeseados.includes(key)) {
+          if (typeof user[key] === 'boolean') {
+            nuevoUser[key] = user[key] ? 'SI' : 'NO';
+          } else {
+            nuevoUser[key] = user[key];
+          }
         }
-      }
+      });
+      return nuevoUser;
     });
-    return nuevoUser;
-  });
 
-  const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datosLimpios);
-  const wb: XLSX.WorkBook = { Sheets: { 'Usuarios': ws }, SheetNames: ['Usuarios'] };
-  const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  FileSaver.saveAs(
-    new Blob([buffer], { type: 'application/octet-stream' }),
-    `usuarios_${new Date().toISOString().slice(0, 10)}.xlsx`
-  );
-}
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datosLimpios);
+    const wb: XLSX.WorkBook = { Sheets: { 'Usuarios': ws }, SheetNames: ['Usuarios'] };
+    const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    FileSaver.saveAs(
+      new Blob([buffer], { type: 'application/octet-stream' }),
+      `usuarios_${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
+  }
 
 
   isSlidingOut = false;
@@ -92,7 +90,61 @@ volverAlHome() {
   this.isSlidingOut = true;
   setTimeout(() => {
     this.router.navigate(['/home']);
-  }, 500); // 0.5s = duración de la animación en CSS
+  }, 500);
+}
+
+async exportarTurnosPaciente(paciente: any) {
+  // Traer los turnos con relaciones completas
+  const { data: turnos, error } = await this.supabase.client
+    .from('turnos')
+    .select(`
+      fecha_inicio,
+      fecha_fin,
+      estado,
+      resena,
+      comentario,
+      nota_cancelacion,
+      especialistas:especialistas (
+        nombre,
+        apellido,
+        email
+      ),
+      especialidades:especialidades (
+        nombre
+      )
+    `)
+    .eq('id_paciente', paciente.id)
+    .order('fecha_inicio', { ascending: false });
+
+  if (error) {
+    alert('No se pudo exportar los turnos del paciente');
+    return;
+  }
+
+  const datosExcel = (turnos || []).map((t: any) => ({
+    'Fecha Inicio': t.fecha_inicio ? new Date(t.fecha_inicio).toLocaleString() : '',
+    'Fecha Fin': t.fecha_fin ? new Date(t.fecha_fin).toLocaleString() : '',
+    'Especialidad': t.especialidades?.nombre || '',
+    'Especialista': t.especialistas ? (t.especialistas.nombre + ' ' + t.especialistas.apellido) : '',
+    'Email Especialista': t.especialistas?.email || '',
+    'Estado': t.estado,
+    'Reseña': t.resena,
+    'Comentario Paciente': t.comentario,
+    'Motivo cancelación/rechazo': t.nota_cancelacion
+  }));
+
+  if (!datosExcel.length) {
+    alert('Este paciente no tiene turnos registrados.');
+    return;
+  }
+
+  const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datosExcel);
+  const wb: XLSX.WorkBook = { Sheets: { 'TurnosPaciente': ws }, SheetNames: ['TurnosPaciente'] };
+  const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  FileSaver.saveAs(
+    new Blob([buffer], { type: 'application/octet-stream' }),
+    `turnos_${paciente.apellido}_${paciente.nombre}_${new Date().toISOString().slice(0, 10)}.xlsx`
+  );
 }
 
 

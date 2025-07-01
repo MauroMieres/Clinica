@@ -125,22 +125,42 @@ exportarExcelTurnos() {
 }
 
 exportarPDFTurnos() {
-    const doc = new jsPDF();
+  const doc = new jsPDF();
 
-    doc.text('Cantidad de turnos por especialidad', 14, 18);
+  doc.text('Cantidad de turnos por especialidad', 14, 18);
 
-    // Acceder al canvas
-    const canvas = this.chartCanvas?.nativeElement;
+  const canvas = this.chartCanvas?.nativeElement;
 
-    if (canvas) {
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      doc.addImage(imgData, 'PNG', 15, 30, 180, 80);
-    } else {
-      doc.text('No se pudo obtener el gráfico.', 15, 40);
-    }
-
-    doc.save('turnos_por_especialidad.pdf');
+  let y = 30;
+  if (canvas) {
+    const imgData = canvas.toDataURL('image/png', 1.0);
+    doc.addImage(imgData, 'PNG', 15, y, 180, 80);
+    y += 90;
+  } else {
+    doc.text('No se pudo obtener el gráfico.', 15, y + 10);
+    y += 20;
   }
+
+  doc.setFontSize(13);
+  doc.text('Listado de turnos por especialidad:', 14, y + 8);
+
+ const dataTable: any[][] = this.barChartData.labels!.map((nombre, idx) => [
+  (idx + 1).toString(),
+  nombre,
+  this.barChartData.datasets[0].data[idx]?.toString() ?? '0'
+]);
+
+
+  autoTable(doc, {
+    head: [['#', 'Especialidad', 'Cantidad de turnos']],
+    body: dataTable,
+    startY: y + 12,
+    styles: { fontSize: 10 }
+  });
+
+  doc.save('turnos_por_especialidad.pdf');
+}
+
 
 //turnos por dia
 
@@ -198,22 +218,42 @@ exportarExcelTurnosPorDia() {
     saveAs(blob, 'turnos_por_dia.xlsx');
   }
 
-  exportarPDFTurnosPorDia() {
+ exportarPDFTurnosPorDia() {
   const doc = new jsPDF();
   doc.text('Turnos por día', 14, 18);
 
-  // Solo el gráfico:
+  let y = 30;
   const canvas = this.chartCanvasPorDia?.nativeElement;
   if (canvas) {
     const imgData = canvas.toDataURL('image/png', 1.0);
-    // Insertar imagen debajo del título
-    doc.addImage(imgData, 'PNG', 15, 30, 180, 80);
+    doc.addImage(imgData, 'PNG', 15, y, 180, 80);
+    y += 90;
   } else {
-    doc.text('No se pudo obtener el gráfico.', 15, 40);
+    doc.text('No se pudo obtener el gráfico.', 15, y + 10);
+    y += 20;
   }
+
+  doc.setFontSize(13);
+  doc.text('Listado de turnos por día:', 14, y + 8);
+
+  // Enumerar turnos por fecha
+  const dataTable = this.turnosPorDia.map((t, idx) => [
+    (idx + 1).toString(),
+    t.fecha,
+    t.cantidad.toString()
+  ]);
+
+  autoTable(doc, {
+    head: [['#', 'Fecha', 'Cantidad de turnos']],
+    body: dataTable,
+    startY: y + 12,
+    styles: { fontSize: 10 }
+  });
 
   doc.save('turnos_por_dia.pdf');
 }
+
+
 }
 
 

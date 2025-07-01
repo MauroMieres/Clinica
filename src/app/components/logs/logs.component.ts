@@ -94,7 +94,7 @@ this.barChartData = {
   const dataExcel = this.logs.map(log => ({
     Usuario: log.user_id,
     Fecha: this.toLocalDate(log.created_at),
-    Hora: this.toLocalTime(log.created_at) // Ahora siempre 24hs
+    Hora: this.toLocalTime(log.created_at) 
   }));
   const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataExcel);
   const wb: XLSX.WorkBook = XLSX.utils.book_new();
@@ -110,22 +110,40 @@ exportarPDF() {
 
   doc.text('Cantidad de ingresos por día', 14, 18);
 
-  // 1. Accedé al canvas del gráfico
   const canvas = this.chartCanvas?.nativeElement;
 
+  let y = 30;
   if (canvas) {
-    // 2. Convertí el canvas a imagen
     const imgData = canvas.toDataURL('image/png', 1.0);
 
-    // 3. Insertá la imagen en el PDF
-    // (x, y, width, height) -- ajustá el tamaño a tu gusto
-    doc.addImage(imgData, 'PNG', 15, 30, 180, 80);
+    doc.addImage(imgData, 'PNG', 15, y, 180, 80);
+    y += 90;
   } else {
-    doc.text('No se pudo obtener el gráfico.', 15, 40);
+    doc.text('No se pudo obtener el gráfico.', 15, y + 10);
+    y += 20;
   }
+
+
+  doc.setFontSize(13);
+  doc.text('Listado de ingresos:', 14, y + 8);
+
+  const tablaLogs = this.logs.map((log, idx) => [
+    (idx + 1).toString(),
+    log.user_id,
+    this.toLocalDate(log.created_at),
+    this.toLocalTime(log.created_at)
+  ]);
+
+  autoTable(doc, {
+    head: [['#', 'Usuario', 'Fecha', 'Hora']],
+    body: tablaLogs,
+    startY: y + 12,
+    styles: { fontSize: 10 }
+  });
 
   doc.save('logs_ingresos.pdf');
 }
+
 
 
 

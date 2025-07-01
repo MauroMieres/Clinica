@@ -50,7 +50,7 @@ toggleHistoriaClinica() {
 
 
   ngOnInit(): void {
-      // 🔍 Mostrar payload completo en consola
+     
     console.log('🧾 Payload recibido en DetalleUsuarioComponent:');
     console.log(JSON.stringify(this.usuario, null, 2));
     if (!this.usuario || !this.tipo) {

@@ -97,17 +97,14 @@ export class PacientesComponent implements OnInit {
     }
     console.log('Historias clínicas encontradas:', historiasClinicas);
 
-    // 6. Armar Map de datos de paciente
     const mapDatosPacientes = new Map<number, any>();
     (datosPacientes || []).forEach(p => mapDatosPacientes.set(p.id, p));
 
-    // 7. Unir datos de paciente, turnos y match con historia clínica (por fecha exacta)
     this.pacientes = Array.from(pacientesMap.values()).map(p => {
       const datosPaciente = mapDatosPacientes.get(p.pacienteId);
 
-      // Para cada turno, buscar la historia clínica asociada (por paciente, especialista y fecha)
       const turnosConHistoria = p.turnos.map(turno => {
-        // Compara fecha exacta (ajustá si necesitás por solo día)
+
         const historia = (historiasClinicas || []).find(h =>
           h.paciente_id === turno.id_paciente &&
           h.especialista_id === turno.id_especialista &&
@@ -120,7 +117,7 @@ export class PacientesComponent implements OnInit {
       });
 
       return {
-        ...datosPaciente, // puede ser undefined si no existe (poco probable)
+        ...datosPaciente,
         turnos: turnosConHistoria
       }
     });
@@ -145,7 +142,6 @@ toggleHistoriaClinicaTurno(turno: any) {
   if (turno.mostrarHistoria) {
     turno.mostrarHistoria = false;
   } else {
-    // Cerrar cualquier otra abierta
     (this.pacientes || []).forEach((p: any) => (p.turnos || []).forEach((t: any) => t.mostrarHistoria = false));
 
     turno.mostrarHistoria = true;

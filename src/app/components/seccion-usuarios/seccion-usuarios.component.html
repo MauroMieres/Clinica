@@ -1,65 +1,64 @@
 <div class="full-background d-flex align-items-center justify-content-start min-vh-100 position-relative">
-  <div
-    class="welcome-box p-4 shadow"
-    [class.slide-out]="isSlidingOut"
-    style="width: 100vw; max-width: 1100px; margin: auto;"
-  >
-
   
+  <div
+  class="welcome-box p-4 shadow mt-5"
+  [class.slide-out]="isSlidingOut"
+  style="width: 100vw; max-width: 1100px; margin: auto;"
+>
+
     <div class="container mt-4">
-      <!-- Título + Botón en la misma fila -->
       <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="m-0">Administración de Usuarios</h2>
-  <div>
-    <button class="btn btn-success me-2" [routerLink]="['/register']" [queryParams]="{ admin: true }">
-      + Crear Usuario
-    </button>
+        <h2 class="m-0">Administración de Usuarios</h2>
+        <div>
+          <button class="btn btn-success me-2" [routerLink]="['/register']" [queryParams]="{ admin: true }">
+            + Crear Usuario
+          </button>
+          <button class="btn btn-outline-primary me-2" (click)="exportarUsuariosAExcel()">
+            Descargar Excel de Usuarios
+          </button>
+          <button class="btn btn-secondary" (click)="volverAlHome()" [disabled]="isFadingOut">
+            ← Volver al Home
+          </button>
+        </div>
+      </div>
 
-    <button class="btn btn-outline-primary me-2" (click)="exportarUsuariosAExcel()">
-  Descargar Excel de Usuarios
-</button>
+      <div class="row">
+        <div class="col-md-4 mb-4" *ngFor="let paciente of pacientes">
+          <div class="card user-card h-100 shadow">
+            <div class="card-body text-center">
+              <h5 class="card-title mb-1">{{ paciente.nombre }} {{ paciente.apellido }}</h5>
+              <p class="mb-1"><small>{{ paciente.email }}</small></p>
+              <button class="btn btn-sm btn-outline-primary mt-2" (click)="exportarTurnosPaciente(paciente)">
+                Descargar Turnos
+              </button>
+            </div>
+          </div>
+        </div>
 
-    <button class="btn btn-secondary" (click)="volverAlHome()" [disabled]="isFadingOut">
-  ← Volver al Home
-</button>
-
-  </div>
-</div>
-
-  <div class="row">
-    <!-- Pacientes -->
-    <div class="col-md-4">
-      <h4>Pacientes</h4>
-      <ul class="list-group">
-        <li *ngFor="let paciente of pacientes" class="list-group-item d-flex justify-content-between align-items-center">
-          {{ paciente.nombre }} {{ paciente.apellido }}
-          <button class="btn btn-sm btn-primary" (click)="verDetalle(paciente, 'paciente')">Ver</button>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Especialistas -->
-    <div class="col-md-4">
-      <h4>Especialistas</h4>
-      <ul class="list-group">
-        <li *ngFor="let especialista of especialistas" class="list-group-item d-flex justify-content-between align-items-center">
-          {{ especialista.nombre }} {{ especialista.apellido }}
-          <button class="btn btn-sm btn-primary" (click)="verDetalle(especialista, 'especialista')">Ver</button>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Administradores -->
-    <div class="col-md-4">
-      <h4>Administradores</h4>
-      <ul class="list-group">
-        <li *ngFor="let admin of administradores" class="list-group-item d-flex justify-content-between align-items-center">
-          {{ admin.nombre }} {{ admin.apellido }}
-          <button class="btn btn-sm btn-primary" (click)="verDetalle(admin, 'administrador')">Ver</button>
-        </li>
-      </ul>
+        <!-- Especialistas -->
+<div class="col-md-4 mb-4" *ngFor="let especialista of especialistas">
+  <div class="card user-card h-100 shadow">
+    <div class="card-body text-center">
+      <h5 class="card-title mb-1">{{ especialista.nombre }} {{ especialista.apellido }}</h5>
+      <p class="mb-1"><small>{{ especialista.email }}</small></p>
+      <span class="badge bg-info">Especialista</span>
     </div>
   </div>
 </div>
+
+<!-- Administradores -->
+<div class="col-md-4 mb-4" *ngFor="let admin of administradores">
+  <div class="card user-card h-100 shadow">
+    <div class="card-body text-center">
+      <h5 class="card-title mb-1">{{ admin.nombre }} {{ admin.apellido }}</h5>
+      <p class="mb-1"><small>{{ admin.email }}</small></p>
+      <span class="badge bg-dark">Administrador</span>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </div>
   </div>
 </div>

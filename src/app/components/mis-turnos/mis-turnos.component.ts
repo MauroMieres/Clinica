@@ -99,10 +99,10 @@ async cargarTurnosEspecialista() {
   } else {
     this.turnos = data || [];
     await this.cargarEspecialidadesParaFiltro();
-    this.filtrarTurnosPorEspecialidad(); // aplicar filtro al inicio
+    this.filtrarTurnosPorEspecialidad();
 
     await this.cargarHistoriasClinicasParaTurnos(this.turnos);
-this.turnosFiltrados = [...this.turnos]; // refrescá la copia filtrada
+this.turnosFiltrados = [...this.turnos]; 
 
   }
 }
@@ -118,10 +118,9 @@ filtrarTurnosGeneral() {
   }
 
   this.turnosFiltrados = this.turnos.filter(turno => {
-    // Armá un string grande con todos los campos que quieras buscar
+   
     let texto = '';
 
-    // Turno básico
     texto += (turno.especialidades?.nombre || '') + ' ';
     texto += (turno.pacientes ? (turno.pacientes?.nombre + ' ' + turno.pacientes?.apellido) : '');
     texto += (turno.especialistas ? (turno.especialistas?.nombre + ' ' + turno.especialistas?.apellido) : '');
@@ -207,7 +206,7 @@ verHistoriaClinica(turno: any) {
       this.turnos = data || [];
       this.turnosFiltrados = [...this.turnos];
       await this.cargarHistoriasClinicasParaTurnos(this.turnos);
-this.turnosFiltrados = [...this.turnos]; // refrescá la copia filtrada
+this.turnosFiltrados = [...this.turnos];
 
 
     }
@@ -284,8 +283,8 @@ this.turnosFiltrados = [...this.turnos]; // refrescá la copia filtrada
  async cargarEspecialistasPorEspecialidad() {
   const { data } = await this.supabaseService.client
     .from('especialista_especialidad')
-    .select('especialista_id') // ✅ campo correcto
-    .eq('especialidad_id', this.especialidadSeleccionada); // ✅ campo correcto
+    .select('especialista_id') 
+    .eq('especialidad_id', this.especialidadSeleccionada); 
 
   const ids = data?.map(e => e.especialista_id) || [];
   this.especialistasFiltrados = this.especialistas.filter(e => ids.includes(e.id));
@@ -294,8 +293,8 @@ this.turnosFiltrados = [...this.turnos]; // refrescá la copia filtrada
  async cargarEspecialidadesPorEspecialista() {
   const { data } = await this.supabaseService.client
     .from('especialista_especialidad')
-    .select('especialidad_id') // ✅ campo correcto
-    .eq('especialista_id', this.especialistaSeleccionado); // ✅ campo correcto
+    .select('especialidad_id') 
+    .eq('especialista_id', this.especialistaSeleccionado); 
 
   const ids = data?.map(e => e.especialidad_id) || [];
   this.especialidadesFiltradas = this.especialidades.filter(e => ids.includes(e.id));

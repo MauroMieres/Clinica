@@ -24,6 +24,6 @@ export class HomeComponent implements OnInit {
     this.isFadingOut = true;
     setTimeout(() => {
       this.router.navigate(['/usuarios']);
-    }, 500); // que coincida con el CSS (0.5s)
+    }, 500); 
   }
 }
