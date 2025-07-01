@@ -46,30 +46,54 @@ export class SeccionUsuariosComponent implements OnInit {
 }
 
  exportarUsuariosAExcel() {
-    // Unifica los arrays agregando una columna tipo
-    const datos = [
-      ...this.pacientes.map(u => ({ ...u, tipo: 'Paciente' })),
-      ...this.especialistas.map(u => ({ ...u, tipo: 'Especialista' })),
-      ...this.administradores.map(u => ({ ...u, tipo: 'Administrador' }))
-    ];
+  const datos = [
+    ...this.pacientes.map(u => ({ ...u, tipo: 'Paciente' })),
+    ...this.especialistas.map(u => ({ ...u, tipo: 'Especialista' })),
+    ...this.administradores.map(u => ({ ...u, tipo: 'Administrador' }))
+  ];
 
-    // Remueve columnas no deseadas, si querés (opcional)
-    // const datosLimpios = datos.map(({ password, ...rest }) => rest);
+  // Campos que NO se deben exportar
+  const camposNoDeseados = [
+    'id',
+    'id_auth_user',
+    'foto1_url',
+    'foto2_url',
+    'foto_url'
+  ];
 
-    // Crea el sheet y el archivo
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datos);
-    const wb: XLSX.WorkBook = { Sheets: { 'Usuarios': ws }, SheetNames: ['Usuarios'] };
-    const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    FileSaver.saveAs(new Blob([buffer], { type: 'application/octet-stream' }),
-      `usuarios_${new Date().toISOString().slice(0, 10)}.xlsx`
-    );
-  }
+  const datosLimpios = datos.map(user => {
+    const nuevoUser: any = {};
+    Object.keys(user).forEach(key => {
+      if (!camposNoDeseados.includes(key)) {
+        // Convierte booleanos a "SI" o "NO"
+        if (typeof user[key] === 'boolean') {
+          nuevoUser[key] = user[key] ? 'SI' : 'NO';
+        } else {
+          nuevoUser[key] = user[key];
+        }
+      }
+    });
+    return nuevoUser;
+  });
 
-   volverAlHome() {
-    this.isFadingOut = true;
-    setTimeout(() => {
-      this.router.navigate(['/home']);
-    }, 500); // Tiempo igual al CSS (0.5s)
-  }
+  const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datosLimpios);
+  const wb: XLSX.WorkBook = { Sheets: { 'Usuarios': ws }, SheetNames: ['Usuarios'] };
+  const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  FileSaver.saveAs(
+    new Blob([buffer], { type: 'application/octet-stream' }),
+    `usuarios_${new Date().toISOString().slice(0, 10)}.xlsx`
+  );
+}
+
+
+  isSlidingOut = false;
+
+volverAlHome() {
+  this.isSlidingOut = true;
+  setTimeout(() => {
+    this.router.navigate(['/home']);
+  }, 500); // 0.5s = duración de la animación en CSS
+}
+
 
 }

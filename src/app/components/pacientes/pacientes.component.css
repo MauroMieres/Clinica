@@ -1,7 +1,28 @@
-.full-background {
-  background-image: url('https://jiwshjrecqfnhgnziubk.supabase.co/storage/v1/object/public/imagenes/sitioWeb/registro.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  position: relative;
+
+.foto-dni {
+  width: 80px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #ccd;
+  background: #f2f2f2;
+  margin-right: 8px; /* Espaciado entre fotos, opcional */
 }
+.dni-card {
+  background: #fff;
+  border: 1px solid #eee;
+  max-width: 600px;
+  margin: auto;
+}
+.datos-enumerados > div {
+  margin-bottom: 0.5em;
+  font-size: 1.02em;
+}
+
+
+@media (max-width: 600px) {
+  .dni-card { flex-direction: column !important; }
+  .fotos-dni { flex-direction: row !important; gap: 12px; }
+}
+
+

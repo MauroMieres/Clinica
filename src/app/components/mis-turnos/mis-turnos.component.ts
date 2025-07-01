@@ -697,11 +697,12 @@ async marcarComoFinalizado(turno: any) {
       .insert([{
         paciente_id: turno.id_paciente,
         especialista_id: turno.id_especialista,
-        fecha_atencion: turno.fecha_fin, // O usar new Date() si preferís el momento real
+        fecha_atencion: turno.fecha_fin, 
         altura: formValues.altura,
         peso: formValues.peso,
         temperatura: formValues.temperatura,
-        presion: formValues.presion
+        presion: formValues.presion,
+        id_especialidad: turno.id_especialidad 
       }])
       .select()
       .single();
@@ -771,50 +772,74 @@ abrirResena(turno: any) {
 async completarEncuesta(turno: any) {
   const { value: formValues } = await Swal.fire({
     title: 'Completar encuesta',
+    width: 1000,
     html: `
-      <div style="margin-bottom:10px;">
-        <label style="display:block;margin-bottom:5px;">Calificá la atención:</label>
-        <div id="star-rating" style="font-size:2rem; color: #ffc107;">
-          <span class="swal-star" data-value="1">&#9733;</span>
-          <span class="swal-star" data-value="2">&#9733;</span>
-          <span class="swal-star" data-value="3">&#9733;</span>
-          <span class="swal-star" data-value="4">&#9733;</span>
-          <span class="swal-star" data-value="5">&#9733;</span>
-        </div>
-      </div>
-      <textarea id="encuesta-text" class="swal2-textarea" placeholder="Escribí tu opinión..." style="width:100%"></textarea>
+     <div style="margin-bottom:10px;">
+  <label style="display:block;margin-bottom:5px;">Calificá la atención (1 a 10):</label>
+  <div 
+    id="num-rating"
+    style="
+      font-size:1.7rem;
+      color:#1976d2;
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 700px;
+      margin: auto;
+      padding: 10px 0;
+    ">
+    ${Array.from({length: 10}, (_, i) => `
+      <span class="swal-num" data-value="${i+1}" 
+        style="
+          flex:1;
+          text-align: center;
+          padding: 14px 0;
+          border-radius: 8px;
+          border:1.5px solid #eee;
+          background: #f5f5f5;
+          cursor:pointer;
+          transition:all .2s;
+          font-weight: 600;
+          user-select: none;
+          ">
+        ${i+1}
+      </span>
+    `).join('')}
+  </div>
+</div>
+<textarea id="encuesta-text" wi class="swal2-textarea" placeholder="Escribí tu opinión..." style="width:80%"></textarea>
+
     `,
     focusConfirm: false,
     preConfirm: async () => {
-      const estrellas = (document.querySelector('.swal-star.selected:last-of-type') as HTMLElement)?.getAttribute('data-value');
+      const seleccionada = document.querySelector('.swal-num.selected') as HTMLElement;
+      const valor = seleccionada?.getAttribute('data-value');
       const encuesta = (document.getElementById('encuesta-text') as HTMLTextAreaElement).value;
-      if (!estrellas) {
-        Swal.showValidationMessage('Debés seleccionar una calificación (estrellas)');
+      if (!valor) {
+        Swal.showValidationMessage('Debés seleccionar una calificación');
         return false;
       }
       if (!encuesta || encuesta.trim().length < 5) {
         Swal.showValidationMessage('Escribí al menos 5 caracteres en la encuesta');
         return false;
       }
-      return { estrellas: parseInt(estrellas), encuesta };
+      return { estrellas: parseInt(valor), encuesta };
     },
     didOpen: () => {
-      // Logica de estrellas clickeables
-      const stars = Array.from(document.querySelectorAll('.swal-star')) as HTMLElement[];
-      stars.forEach((star, i) => {
-        star.addEventListener('mouseenter', () => {
-          stars.forEach((s, j) => s.style.color = j <= i ? '#ffc107' : '#e4e5e9');
-        });
-        star.addEventListener('mouseleave', () => {
-          const selected = document.querySelectorAll('.swal-star.selected').length;
-          stars.forEach((s, j) => s.style.color = j < selected ? '#ffc107' : '#e4e5e9');
-        });
-        star.addEventListener('click', () => {
-          stars.forEach((s, j) => {
-            if (j <= i) s.classList.add('selected');
-            else s.classList.remove('selected');
-            s.style.color = j <= i ? '#ffc107' : '#e4e5e9';
+      const nums = Array.from(document.querySelectorAll('.swal-num')) as HTMLElement[];
+      nums.forEach((num, i) => {
+        num.addEventListener('click', () => {
+          nums.forEach(n => {
+            n.classList.remove('selected');
+            n.style.background = '#f5f5f5';
+            n.style.color = '#1976d2';
+            n.style.border = '1px solid #eee';
           });
+          num.classList.add('selected');
+          num.style.background = '#1976d2';
+          num.style.color = '#fff';
+          num.style.border = '1px solid #1976d2';
         });
       });
     },

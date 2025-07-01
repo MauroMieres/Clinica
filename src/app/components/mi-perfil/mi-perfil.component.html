@@ -1,5 +1,6 @@
 <div class="fondo-clinica">
-<div class="container py-4">
+  <div class="perfil-wrapper d-flex justify-content-center align-items-center min-vh-100">
+    <div class="perfil-card bg-white p-4 rounded shadow" style="max-width: 1000px; width: 100%;">
   <h2 class="mb-4">Mi perfil</h2>
 
   <div *ngIf="user">
@@ -33,10 +34,24 @@
     <img *ngIf="user.foto2_url" [src]="user.foto2_url" class="img-thumbnail" width="200" alt="Foto 2">
   </div>
   <div class="text-center mb-3">
-    <button class="btn btn-primary" (click)="verHistoriaClinica()">
+    
+    
+  </div>
+  <div class="mb-3" *ngIf="userRole === 'paciente'">
+  <label>Filtrar por especialidad (Solo aplica a la exportación):</label>
+  <select class="form-select w-auto d-inline-block" [(ngModel)]="especialidadSeleccionada">
+    <option value="">Todas</option>
+    <option *ngFor="let esp of especialidadesDelPaciente" [value]="esp">{{ esp }}</option>
+  </select>
+  <button class="btn btn-danger ms-3" (click)="exportarHistoriaPDF()">
+    Exportar a PDF
+  </button>
+</div>
+
+<button class="btn btn-primary" (click)="verHistoriaClinica()">
       {{ verHistoria ? 'Ocultar' : 'Ver' }} Historia Clínica
     </button>
-  </div>
+
   <app-historia-clinica
     *ngIf="verHistoria"
     [pacienteId]="user.id">

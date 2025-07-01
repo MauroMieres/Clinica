@@ -1,20 +1,49 @@
-<div class="full-background d-flex align-items-center justify-content-start min-vh-100 position-relative">
-<div class="container py-4">
-  <h2>Pacientes Atendidos</h2>
-  <div *ngIf="pacientes.length === 0" class="text-muted mt-4">No hay pacientes atendidos aún.</div>
+<div class="fondo-clinica">
+  <div style="padding: 24px 48px;"></div>
+<!-- 24px arriba/abajo, 48px izquierda/derecha -->
 
-  <div *ngFor="let paciente of pacientes" class="card mb-3 p-3">
-    <b>{{ paciente.nombre }} {{ paciente.apellido }}</b>
-    <div>DNI: {{ paciente.dni }} - Email: {{ paciente.email }}</div>
-
-    <!-- Botón para ver historia clínica -->
-    <button class="btn btn-primary btn-sm mt-2" (click)="toggleHistoriaClinica(paciente.id)">
-      Ver Historia Clínica
-    </button>
-
-    <!-- Historia Clínica visible solo si el ID coincide -->
-    <div *ngIf="verHistoriaClinica && pacienteSeleccionadoId === paciente.id" class="mt-3">
-      <app-historia-clinica [pacienteId]="paciente.id"></app-historia-clinica>
+<div *ngFor="let paciente of pacientes" class="dni-card mb-4 p-4 shadow rounded ">
+  <!-- Fotos y datos enumerados en una sola fila -->
+  <div class="d-flex flex-row align-items-start gap-4">
+    <div class="d-flex flex-row gap-2">
+      <img [src]="paciente.foto1_url || 'assets/avatar1.svg'" alt="Foto 1" class="foto-dni" />
+      <img [src]="paciente.foto2_url || 'assets/avatar2.svg'" alt="Foto 2" class="foto-dni" />
+    </div>
+    <div class="datos-enumerados">
+      <div><b>1. Nombre:</b> {{ paciente.nombre }} {{ paciente.apellido }}</div>
+      <div><b>2. DNI:</b> {{ paciente.dni }}</div>
+      <div><b>3. Obra Social:</b> {{ paciente.obra_social || 'Sin datos' }}</div>
+      <div><b>4. Email:</b> {{ paciente.email }}</div>
     </div>
   </div>
+
+  <!-- Botón para ver los últimos 3 turnos -->
+  <div class="mt-3">
+    <details>
+      <summary class="btn btn-link p-0">Ver últimos 3 turnos</summary>
+      <ul class="list-group list-group-flush mt-2">
+        <li class="list-group-item" *ngFor="let turno of obtenerTurnosUnicos(paciente.turnos)">
+          <b>Fecha:</b> {{ turno.fecha_fin | date:'dd/MM/yyyy HH:mm' }}<br>
+          <ng-container *ngIf="turno.id_historia_clinica; else sinHistoria">
+            <button class="btn btn-primary btn-sm mt-2"
+                    (click)="toggleHistoriaClinicaTurno(turno)">
+              {{ turno.mostrarHistoria ? 'Cerrar historia clínica' : 'Ver Historia Clínica de este turno' }}
+            </button>
+            <div *ngIf="turno.mostrarHistoria" class="mt-2">
+              <app-historia-clinica [historiaId]="turno.id_historia_clinica"></app-historia-clinica>
+            </div>
+          </ng-container>
+          <ng-template #sinHistoria>
+            <span class="text-muted" style="font-size:0.96em;">
+              Este turno no tiene historia clínica, fue realizado bajo prácticas anteriores.
+            </span>
+          </ng-template>
+        </li>
+        <li class="list-group-item text-muted" *ngIf="!paciente.turnos?.length">
+          No hay turnos recientes.
+        </li>
+      </ul>
+    </details>
+  </div>
+</div>
 </div>
